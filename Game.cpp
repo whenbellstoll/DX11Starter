@@ -148,6 +148,7 @@ void Game::CreateBasicGeometry()
 	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	XMFLOAT4 black = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Set up the vertices of the triangle we would like to draw
 	// - We're going to copy this array, exactly as it exists in memory
@@ -163,9 +164,9 @@ void Game::CreateBasicGeometry()
 	//    since we're describing the triangle in terms of the window itself
 	Vertex vertices[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), red },
-		{ XMFLOAT3(+0.5f, -0.5f, +0.0f), blue },
-		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), green },
+		{ XMFLOAT3(+0.8f, +0.25f, +0.0f), red },
+		{ XMFLOAT3(+0.95f, -0.15f, +0.0f), blue },
+		{ XMFLOAT3(+0.75f, -0.05f, +0.0f), green },
 	};
 
 	// Set up the indices, which tell us which vertices to use and in which order
@@ -175,49 +176,19 @@ void Game::CreateBasicGeometry()
 	// - But just to see how it's done...
 	unsigned int indices[] = { 0, 1, 2 };
 
+	Vertex hat[] =
+	{
+		{ XMFLOAT3(-0.15f, +0.35f, +0.0f), black },
+		{ XMFLOAT3(+0.15f, -0.35f, +0.0f), black },
+		{ XMFLOAT3(-0.15f, -0.35f, +0.0f), black },
+		{ XMFLOAT3(+0.15f, +0.35f, +0.0f), black },
+		{ XMFLOAT3(+0.30f, -0.45f, +0.0f), black },
+		{ XMFLOAT3(-0.30f, -0.45f, +0.0f), black },
+	};
+	unsigned int hatI[] = { 0, 1, 2, 3, 1, 0, 2, 1, 5, 4, 5, 1 };
 
-	// Create the VERTEX BUFFER description -----------------------------------
-	// - The description is created on the stack because we only need
-	//    it to create the buffer.  The description is then useless.
-	D3D11_BUFFER_DESC vbd;
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * 3;       // 3 = number of vertices in the buffer
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // Tells DirectX this is a vertex buffer
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
-
-	// Create the proper struct to hold the initial vertex data
-	// - This is how we put the initial data into the buffer
-	D3D11_SUBRESOURCE_DATA initialVertexData;
-	initialVertexData.pSysMem = vertices;
-
-	// Actually create the buffer with the initial data
-	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
-	device->CreateBuffer(&vbd, &initialVertexData, vertexBuffer.GetAddressOf());
-
-
-
-	// Create the INDEX BUFFER description ------------------------------------
-	// - The description is created on the stack because we only need
-	//    it to create the buffer.  The description is then useless.
-	D3D11_BUFFER_DESC ibd;
-	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(unsigned int) * 3;	// 3 = number of indices in the buffer
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;	// Tells DirectX this is an index buffer
-	ibd.CPUAccessFlags = 0;
-	ibd.MiscFlags = 0;
-	ibd.StructureByteStride = 0;
-
-	// Create the proper struct to hold the initial index data
-	// - This is how we put the initial data into the buffer
-	D3D11_SUBRESOURCE_DATA initialIndexData;
-	initialIndexData.pSysMem = indices;
-
-	// Actually create the buffer with the initial data
-	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
-	device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
-
+	meshes[0] = Mesh(vertices, 3, indices, 3, device);
+	meshes[1] = Mesh(hat, 6, hatI, 12, device);
 }
 
 
@@ -284,19 +255,43 @@ void Game::Draw(float deltaTime, float totalTime)
 	//    in a larger application/game
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	/* for (int i = 0; i < 2; i++)
+	{
+		context->IASetVertexBuffers(0, 1, meshes[i].GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(meshes[i].GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+		
+		// Do the actual drawing
+		context->DrawIndexed(
+			meshes[i].GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+			0,     // Offset to the first index we want to use
+			0);    // Offset to add to each index when looking up vertices
+	}*/
+	
 
+	context->IASetVertexBuffers(0, 1, meshes[0].GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(meshes[0].GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+	// Do the actual drawing
+	context->DrawIndexed(
+		meshes[0].GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+		0,     // Offset to the first index we want to use
+		0);    // Offset to add to each index when looking up vertices
+
+	context->IASetVertexBuffers(0, 1, meshes[1].GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(meshes[1].GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+	// Do the actual drawing
+	context->DrawIndexed(
+		meshes[1].GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+		0,     // Offset to the first index we want to use
+		0);    // Offset to add to each index when looking up vertices
 
 	// Finally do the actual drawing
 	//  - Do this ONCE PER OBJECT you intend to draw
 	//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
 	//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
 	//     vertices in the currently set VERTEX BUFFER
-	context->DrawIndexed(
-		3,     // The number of indices to use (we could draw a subset if we wanted)
-		0,     // Offset to the first index we want to use
-		0);    // Offset to add to each index when looking up vertices
+	
 
 
 
