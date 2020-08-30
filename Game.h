@@ -33,7 +33,9 @@ private:
 	//  - More info here: https://github.com/Microsoft/DirectXTK/wiki/ComPtr
 
 	//Meshes to hold geometery
-	Mesh meshes[2] = { Mesh(), Mesh() };
+	Mesh * triangle = nullptr;
+	Mesh * topHat = nullptr;
+	Mesh * cubeMesh = nullptr;
 	
 	// Shaders and shader-related constructs
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
@@ -41,4 +43,3 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
 };
-

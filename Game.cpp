@@ -44,7 +44,9 @@ Game::~Game()
 	// we don't need to explicitly clean up those DirectX objects
 	// - If we weren't using smart pointers, we'd need
 	//   to call Release() on each DirectX object created in Game
-
+	delete cubeMesh;
+	delete triangle;
+	delete topHat;
 }
 
 // --------------------------------------------------------
@@ -149,6 +151,8 @@ void Game::CreateBasicGeometry()
 	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	XMFLOAT4 black = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT4 white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	XMFLOAT4 pink = XMFLOAT4(0.15f, 0.0f, 0.0f, 1.0f);
 
 	// Set up the vertices of the triangle we would like to draw
 	// - We're going to copy this array, exactly as it exists in memory
@@ -173,7 +177,7 @@ void Game::CreateBasicGeometry()
 	// - This is somewhat redundant for just 3 vertices (it's a simple example)
 	// - Indices are technically not required if the vertices are in the buffer 
 	//    in the correct order and each one will be used exactly once
-	// - But just to see how it's done...
+
 	unsigned int indices[] = { 0, 1, 2 };
 
 	Vertex hat[] =
@@ -182,13 +186,30 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(+0.15f, -0.35f, +0.0f), black },
 		{ XMFLOAT3(-0.15f, -0.35f, +0.0f), black },
 		{ XMFLOAT3(+0.15f, +0.35f, +0.0f), black },
-		{ XMFLOAT3(+0.30f, -0.45f, +0.0f), black },
-		{ XMFLOAT3(-0.30f, -0.45f, +0.0f), black },
+		{ XMFLOAT3(+0.30f, -0.50f, +0.0f), black },
+		{ XMFLOAT3(-0.30f, -0.50f, +0.0f), black },
 	};
 	unsigned int hatI[] = { 0, 1, 2, 3, 1, 0, 2, 1, 5, 4, 5, 1 };
 
-	meshes[0] = Mesh(vertices, 3, indices, 3, device);
-	meshes[1] = Mesh(hat, 6, hatI, 12, device);
+
+	// Getting ambitious, making a 3D object
+	Vertex cube[] =
+	{
+		{ XMFLOAT3(-0.75f, +0.35f, +0.24f), white },
+		{ XMFLOAT3(-0.75f, +0.10f, +0.24f), white },
+		{ XMFLOAT3(-0.62f, +0.45f, +0.36f), red },
+		{ XMFLOAT3(-0.62f, +0.10f, +0.36f), white },
+		{ XMFLOAT3(-0.62f, +0.35f, +0.12f), white },
+		{ XMFLOAT3(-0.62f, +0.00f, +0.12f), red },
+		{ XMFLOAT3(-0.50f, +0.35f, +0.24f), white },
+		{ XMFLOAT3(-0.50f, +0.10f, +0.24f), white },
+	};
+	unsigned int cubeI[] = { 0, 1, 2, 2, 1, 3, 2, 3, 7, 6, 2, 7, 4, 6, 7, 4, 7, 5, 0, 4, 5, 0, 5, 1, 2, 6, 4, 2, 4, 0, 3, 7, 5, 3, 5, 1 };
+
+	//create Mesh objects
+	triangle = new Mesh(vertices, 3, indices, 3, device);
+	topHat = new Mesh(hat, 6, hatI, 12, device);
+	cubeMesh = new Mesh(cube, 8, cubeI, 36, device);
 }
 
 
@@ -255,34 +276,31 @@ void Game::Draw(float deltaTime, float totalTime)
 	//    in a larger application/game
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	/* for (int i = 0; i < 2; i++)
-	{
-		context->IASetVertexBuffers(0, 1, meshes[i].GetVertexBuffer().GetAddressOf(), &stride, &offset);
-		context->IASetIndexBuffer(meshes[i].GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-		
-		// Do the actual drawing
-		context->DrawIndexed(
-			meshes[i].GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-			0,     // Offset to the first index we want to use
-			0);    // Offset to add to each index when looking up vertices
-	}*/
 	
-
-	context->IASetVertexBuffers(0, 1, meshes[0].GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(meshes[0].GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	context->IASetVertexBuffers(0, 1, triangle->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(triangle->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Do the actual drawing
 	context->DrawIndexed(
-		meshes[0].GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+		triangle->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 
-	context->IASetVertexBuffers(0, 1, meshes[1].GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(meshes[1].GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	context->IASetVertexBuffers(0, 1, topHat->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(topHat->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Do the actual drawing
 	context->DrawIndexed(
-		meshes[1].GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+		topHat->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+		0,     // Offset to the first index we want to use
+		0);    // Offset to add to each index when looking up vertices
+
+	context->IASetVertexBuffers(0, 1, cubeMesh->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(cubeMesh->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+	// Do the actual drawing
+	context->DrawIndexed(
+		cubeMesh->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 

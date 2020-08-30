@@ -47,6 +47,8 @@ Mesh::Mesh( Vertex v[], int vIndex, unsigned int indices[], int iIndex, Microsof
 	// Actually create the buffer with the initial data
 	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
 	device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
+
+	index = iIndex;
 }
 
 
