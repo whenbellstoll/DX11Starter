@@ -1,6 +1,6 @@
 #include "Game.h"
 #include "Vertex.h"
-
+#include "BufferStructs.h"
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
 #include <d3dcompiler.h>
@@ -61,6 +61,20 @@ void Game::Init()
 	LoadShaders();
 	CreateBasicGeometry();
 	
+
+	// Get size as the next multiple of 16(don’t hardcode a numberhere!)
+	unsigned int size = sizeof(VertexShaderExternalData);
+	size = (size + 15) / 16 * 16; // This will work even if your struct size changes
+
+	// Describe the buffer
+	D3D11_BUFFER_DESC cbDesc = {};
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.ByteWidth = size; // size must be a multiple of 16
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+
+	device->CreateBuffer(&cbDesc, 0, constantBuffer.GetAddressOf());
+
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -241,6 +255,13 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Background color (Cornflower Blue in this case) for clearing
 	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
 
+	// Vertex Shader data struct
+	VertexShaderExternalData vsData; 
+	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 1.0f, 1.0f); 
+	vsData.offset = XMFLOAT3(0.0f, 0.2f, 0.0f);
+
+	
+
 	// Clear the render target and depth buffer (erases what's on the screen)
 	//  - Do this ONCE PER FRAME
 	//  - At the beginning of Draw (before drawing *anything*)
@@ -251,6 +272,17 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
+	// Map the buffer data
+	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+	context->Map(constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+	context->Unmap(constantBuffer.Get(), 0);
+
+
+	// Bind our constant Buffer
+	context->VSSetConstantBuffers(0, // Which slot (register) to bind the buffer to?
+		 1,// How many are we activating?  Can do multiple at once 
+		constantBuffer.GetAddressOf());// Array of buffers (or the address of one)
 
 	// Set the vertex and pixel shaders to use for the next Draw() command
 	//  - These don't technically need to be set every frame
