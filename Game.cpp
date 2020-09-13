@@ -258,7 +258,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Vertex Shader data struct
 	VertexShaderExternalData vsData; 
 	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 1.0f, 1.0f); 
-	vsData.offset = XMFLOAT3(0.0f, 0.2f, 0.0f);
+	
 
 	
 
