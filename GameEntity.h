@@ -7,6 +7,7 @@ class GameEntity
 	Transform transform;
 	Mesh* mesh;
 
+public:
 	// Constructor
 	GameEntity(Mesh* m);
 
@@ -15,6 +16,6 @@ class GameEntity
 	Transform* GetTransform();
 
 	// Draw Method
-	void Draw();
+	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT stride, UINT offset);
 };
 

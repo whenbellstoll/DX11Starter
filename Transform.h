@@ -9,6 +9,7 @@ class Transform
 	DirectX::XMFLOAT3 scale;
 	DirectX::XMFLOAT4X4 worldMatrix;
 
+public:
 	// Constructor
 	Transform();
 
