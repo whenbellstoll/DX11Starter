@@ -16,8 +16,25 @@ Transform* GameEntity::GetTransform()
 	return &transform;
 }
 
-void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT stride, UINT offset)
+void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Buffer> buffer, UINT stride, UINT offset)
 {
+	// Vertex Shader data struct
+	VertexShaderExternalData vsData;
+	vsData.colorTint = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	vsData.worldMatrix = transform.GetWorldMatrix();
+
+	// Map the buffer data
+	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+	context->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+	context->Unmap(buffer.Get(), 0);
+
+
+	// Bind our constant Buffer
+	context->VSSetConstantBuffers(0, // Which slot (register) to bind the buffer to?
+		1,// How many are we activating?  Can do multiple at once 
+		buffer.GetAddressOf());// Array of buffers (or the address of one)
+
 	// Set the buffer
 	context->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &stride, &offset);
 	context->IASetIndexBuffer(mesh->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);

@@ -255,9 +255,6 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Background color (Cornflower Blue in this case) for clearing
 	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
 
-	// Vertex Shader data struct
-	VertexShaderExternalData vsData; 
-	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 1.0f, 1.0f); 
 	
 
 	
@@ -272,17 +269,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-	// Map the buffer data
-	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-	context->Map(constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-	context->Unmap(constantBuffer.Get(), 0);
-
-
-	// Bind our constant Buffer
-	context->VSSetConstantBuffers(0, // Which slot (register) to bind the buffer to?
-		 1,// How many are we activating?  Can do multiple at once 
-		constantBuffer.GetAddressOf());// Array of buffers (or the address of one)
+	
 
 	// Set the vertex and pixel shaders to use for the next Draw() command
 	//  - These don't technically need to be set every frame
@@ -309,32 +296,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	
-	context->IASetVertexBuffers(0, 1, triangle->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(triangle->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	// Do the actual drawing
-	context->DrawIndexed(
-		triangle->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-		0,     // Offset to the first index we want to use
-		0);    // Offset to add to each index when looking up vertices
-
-	context->IASetVertexBuffers(0, 1, topHat->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(topHat->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	// Do the actual drawing
-	context->DrawIndexed(
-		topHat->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-		0,     // Offset to the first index we want to use
-		0);    // Offset to add to each index when looking up vertices
-
-	context->IASetVertexBuffers(0, 1, cubeMesh->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(cubeMesh->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	// Do the actual drawing
-	context->DrawIndexed(
-		cubeMesh->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-		0,     // Offset to the first index we want to use
-		0);    // Offset to add to each index when looking up vertices
+	
 
 	// Finally do the actual drawing
 	//  - Do this ONCE PER OBJECT you intend to draw
