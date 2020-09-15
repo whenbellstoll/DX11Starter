@@ -41,7 +41,7 @@ private:
 	GameEntity* topHatTwo = nullptr;
 	GameEntity* cubeOne = nullptr;
 	GameEntity* cubeTwo = nullptr;
-	GameEntity* triOne = nullptr;
+	GameEntity* triaOne  = nullptr;
 
 	// Buffer to Hold VertexShader external data
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;

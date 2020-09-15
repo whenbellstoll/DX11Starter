@@ -224,6 +224,12 @@ void Game::CreateBasicGeometry()
 	triangle = new Mesh(vertices, 3, indices, 3, device);
 	topHat = new Mesh(hat, 6, hatI, 12, device);
 	cubeMesh = new Mesh(cube, 8, cubeI, 36, device);
+
+	topHatOne = new GameEntity(topHat);
+	topHatTwo = new GameEntity(topHat);
+	cubeOne = new GameEntity(cubeMesh);
+	cubeTwo = new GameEntity(cubeMesh);
+	triaOne = new GameEntity(triangle);
 }
 
 
@@ -245,6 +251,23 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+
+
+	// Update the objects
+
+	// cube one rotates about the x-axis
+	cubeOne->GetTransform()->Rotate(0.01f, 0, 0);
+	// cube two rotates the other way and moves right
+	cubeTwo->GetTransform()->Rotate(-0.01f, 0, 0);
+	cubeTwo->GetTransform()->MoveAbsolute( 0.001f, 0, 0);
+
+	// top Hat one rotates about the z
+	topHatOne->GetTransform()->Rotate(0, 0, 0.01f);
+	// top hat two moves left and away
+	topHatTwo->GetTransform()->MoveAbsolute( -0.001f, 0, 0.001f );
+
+	// triangle just kinda schmoves
+	triaOne->GetTransform()->Rotate(0, 0.01f, 0);
 }
 
 // --------------------------------------------------------
@@ -300,11 +323,11 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	// Finally do the actual drawing
 	//  - Do this ONCE PER OBJECT you intend to draw
-	//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
-	//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
-	//     vertices in the currently set VERTEX BUFFER
-	
-
+	topHatOne->Draw(context, constantBuffer, stride, offset);
+	topHatTwo->Draw(context, constantBuffer, stride, offset);
+	cubeOne->Draw(context, constantBuffer, stride, offset);
+	cubeTwo->Draw(context, constantBuffer, stride, offset);
+	triaOne->Draw(context, constantBuffer, stride, offset);
 
 
 	// Present the back buffer to the user
