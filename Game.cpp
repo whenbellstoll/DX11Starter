@@ -257,6 +257,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	// cube one rotates about the x-axis
 	cubeOne->GetTransform()->Rotate(0.01f, 0, 0);
+
 	// cube two rotates the other way and moves right
 	cubeTwo->GetTransform()->Rotate(-0.01f, 0, 0);
 	cubeTwo->GetTransform()->MoveAbsolute( 0.001f, 0, 0);
