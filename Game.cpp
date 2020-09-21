@@ -264,8 +264,17 @@ void Game::Update(float deltaTime, float totalTime)
 
 	// top Hat one rotates about the z
 	topHatOne->GetTransform()->Rotate(0, 0, 0.01f);
+	if (topHatOne->GetTransform()->GetScale().x < 2)
+	{
+		topHatOne->GetTransform()->Scale(0.01f, 0.01f, 0.01f);
+	}
+	else
+	{
+		topHatOne->GetTransform()->SetScale(1, 1, 1);
+	}
 	// top hat two moves left and away
 	topHatTwo->GetTransform()->MoveAbsolute( -0.001f, 0, 0.001f );
+	
 
 	// triangle just kinda schmoves
 	triaOne->GetTransform()->Rotate(0, 0.01f, 0);

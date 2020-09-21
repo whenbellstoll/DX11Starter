@@ -75,3 +75,8 @@ void Transform::Scale(float x, float y, float z)
 {
 	scale = DirectX::XMFLOAT3( scale.x + x, scale.y + y, scale.z + z );
 }
+
+void Transform::MoveRelative(float x, float y, float z)
+{
+
+}

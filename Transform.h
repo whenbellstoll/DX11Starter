@@ -28,5 +28,8 @@ public:
 	void MoveAbsolute(float x, float y, float z);
 	void Rotate(float pitch, float yaw, float roll);
 	void Scale(float x, float y, float z);
+
+	//Assignment 5 Move Relative
+	void MoveRelative(float x, float y, float z);
 };
 
