@@ -47,6 +47,12 @@ Game::~Game()
 	delete cubeMesh;
 	delete triangle;
 	delete topHat;
+
+	delete topHatOne;
+	delete topHatTwo;
+	delete cubeOne;
+	delete cubeTwo;
+	delete triaOne;
 }
 
 // --------------------------------------------------------
