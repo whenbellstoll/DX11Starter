@@ -78,5 +78,12 @@ void Transform::Scale(float x, float y, float z)
 
 void Transform::MoveRelative(float x, float y, float z)
 {
+	// Direction Vector
+	DirectX::XMVECTOR absoluteDirection = DirectX::XMVectorSet(x, y, z, 0);
+	DirectX::XMVECTOR quaternion = DirectX::XMQuaternionRotationRollPitchYaw(GetRotation().x, GetRotation().y, GetRotation().z);
+	DirectX::XMVECTOR directionVec = DirectX::XMVector3Rotate(absoluteDirection, quaternion);
 
+	DirectX::XMVECTOR pos = DirectX::XMLoadFloat3(&GetPosition());
+	pos = DirectX::XMVectorAdd(pos, directionVec);
+	DirectX::XMStoreFloat3(&position, pos);
 }
