@@ -8,10 +8,12 @@ class Camera
 	DirectX::XMFLOAT4X4 viewMatrix;
 	DirectX::XMFLOAT4X4 projMatrix;
 	POINT mousePos;
+	float mouseSpeed;
 	float fov;
 	float nearPlaneDistance;
 	float farPlaneDistance;
 
+public:
 	// Constructor
 	Camera(DirectX::XMFLOAT3 pos, float nFov, float nearClip, float farClip);
 

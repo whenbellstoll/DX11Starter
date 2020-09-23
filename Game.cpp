@@ -53,6 +53,8 @@ Game::~Game()
 	delete cubeOne;
 	delete cubeTwo;
 	delete triaOne;
+
+	delete camera;
 }
 
 // --------------------------------------------------------
@@ -85,6 +87,8 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	camera = new Camera(DirectX::XMFLOAT3(0.0f, 0.0f, -5.0f), 90.0f, 0.1f, 300.0f);
 }
 
 // --------------------------------------------------------
@@ -245,6 +249,10 @@ void Game::CreateBasicGeometry()
 // --------------------------------------------------------
 void Game::OnResize()
 {
+	if (camera != nullptr)
+	{
+		camera->UpdateProjectionMatrix((float)this->width / this->height);
+	}
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
 }
@@ -258,32 +266,38 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
+	//Update the camera
+	camera->Update(deltaTime, hWnd);
+
 
 	// Update the objects
 
 	// cube one rotates about the x-axis
-	cubeOne->GetTransform()->Rotate(0.01f, 0, 0);
+	cubeOne->GetTransform()->Rotate(0.1f * deltaTime, 0, 0);
 
 	// cube two rotates the other way and moves right
-	cubeTwo->GetTransform()->Rotate(-0.01f, 0, 0);
-	cubeTwo->GetTransform()->MoveAbsolute( 0.001f, 0, 0);
+	cubeTwo->GetTransform()->Rotate(-0.1f * deltaTime, 0, 0);
+	cubeTwo->GetTransform()->MoveAbsolute( 0.01f * deltaTime, 0, 0);
 
 	// top Hat one rotates about the z
-	topHatOne->GetTransform()->Rotate(0, 0, 0.01f);
+	topHatOne->GetTransform()->Rotate(0, 0, 0.1f * deltaTime);
 	if (topHatOne->GetTransform()->GetScale().x < 2)
 	{
-		topHatOne->GetTransform()->Scale(0.01f, 0.01f, 0.01f);
+		topHatOne->GetTransform()->Scale(0.1f * deltaTime, 0.1f * deltaTime, 0.1f * deltaTime);
 	}
 	else
 	{
 		topHatOne->GetTransform()->SetScale(1, 1, 1);
 	}
 	// top hat two moves left and away
-	topHatTwo->GetTransform()->MoveAbsolute( -0.001f, 0, 0.001f );
+	topHatTwo->GetTransform()->MoveAbsolute( -0.01f * deltaTime, 0, 0.01f * deltaTime);
 	
 
 	// triangle just kinda schmoves
-	triaOne->GetTransform()->Rotate(0, 0.01f, 0);
+	triaOne->GetTransform()->Rotate(0, 0.1f * deltaTime, 0);
+
+
+
 }
 
 // --------------------------------------------------------
@@ -339,11 +353,11 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	// Finally do the actual drawing
 	//  - Do this ONCE PER OBJECT you intend to draw
-	topHatOne->Draw(context, constantBuffer, stride, offset);
-	topHatTwo->Draw(context, constantBuffer, stride, offset);
-	cubeOne->Draw(context, constantBuffer, stride, offset);
-	cubeTwo->Draw(context, constantBuffer, stride, offset);
-	triaOne->Draw(context, constantBuffer, stride, offset);
+	topHatOne->Draw(context, constantBuffer, stride, offset, camera);
+	topHatTwo->Draw(context, constantBuffer, stride, offset, camera);
+	cubeOne->Draw(context, constantBuffer, stride, offset, camera);
+	cubeTwo->Draw(context, constantBuffer, stride, offset, camera);
+	triaOne->Draw(context, constantBuffer, stride, offset, camera);
 
 
 	// Present the back buffer to the user

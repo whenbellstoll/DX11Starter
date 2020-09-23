@@ -16,12 +16,14 @@ Transform* GameEntity::GetTransform()
 	return &transform;
 }
 
-void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Buffer> buffer, UINT stride, UINT offset)
+void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Buffer> buffer, UINT stride, UINT offset, Camera * camera )
 {
 	// Vertex Shader data struct
 	VertexShaderExternalData vsData;
 	vsData.colorTint = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	vsData.worldMatrix = transform.GetWorldMatrix();
+	vsData.projMatrix = camera->GetProjMatrix();
+	vsData.viewMatrix = camera->GetViewMatrix();
 
 	// Map the buffer data
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};

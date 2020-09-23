@@ -4,6 +4,7 @@
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include "GameEntity.h"
+#include "Camera.h"
 
 class Game 
 	: public DXCore
@@ -43,6 +44,7 @@ private:
 	GameEntity* cubeTwo = nullptr;
 	GameEntity* triaOne  = nullptr;
 
+	Camera* camera = nullptr;
 	// Buffer to Hold VertexShader external data
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
