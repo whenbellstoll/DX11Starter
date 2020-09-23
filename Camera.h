@@ -12,5 +12,16 @@ class Camera
 	float nearPlaneDistance;
 	float farPlaneDistance;
 
+	// Constructor
+	Camera(DirectX::XMFLOAT3 pos, float nFov, float nearClip, float far Clip);
+
+	// Getters
+	DirectX::XMFLOAT4X4 GetViewMatrix();
+	DirectX::XMFLOAT4X4 GetProjMatrix();
+
+	void UpdateProjectionMatrix( float aspectRatio );
+	void UpdateViewMatrix();
+
+	void Update(float dt, HWND windowHandle);
 };
 
