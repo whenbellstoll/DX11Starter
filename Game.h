@@ -45,6 +45,9 @@ private:
 	GameEntity* triaOne  = nullptr;
 
 	Camera* camera = nullptr;
+
+	Material* defaultMaterial = nullptr;
+	Material* redMaterial = nullptr;
 	// Buffer to Hold VertexShader external data
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 

@@ -55,6 +55,9 @@ Game::~Game()
 	delete triaOne;
 
 	delete camera;
+
+	delete defaultMaterial;
+	delete redMaterial;
 }
 
 // --------------------------------------------------------
@@ -235,11 +238,15 @@ void Game::CreateBasicGeometry()
 	topHat = new Mesh(hat, 6, hatI, 12, device);
 	cubeMesh = new Mesh(cube, 8, cubeI, 36, device);
 
-	topHatOne = new GameEntity(topHat);
-	topHatTwo = new GameEntity(topHat);
-	cubeOne = new GameEntity(cubeMesh);
-	cubeTwo = new GameEntity(cubeMesh);
-	triaOne = new GameEntity(triangle);
+	// create Material
+	defaultMaterial = new Material(white, pixelShader, vertexShader);
+	redMaterial = new Material(red, pixelShader, vertexShader);
+
+	topHatOne = new GameEntity(topHat, defaultMaterial);
+	topHatTwo = new GameEntity(topHat, redMaterial);
+	cubeOne = new GameEntity(cubeMesh, defaultMaterial);
+	cubeTwo = new GameEntity(cubeMesh, redMaterial);
+	triaOne = new GameEntity(triangle, defaultMaterial);
 }
 
 
@@ -328,8 +335,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	//  - These don't technically need to be set every frame
 	//  - Once you start applying different shaders to different objects,
 	//    you'll need to swap the current shaders before each draw
-	context->VSSetShader(vertexShader.Get(), 0, 0);
-	context->PSSetShader(pixelShader.Get(), 0, 0);
+	
 
 
 	// Ensure the pipeline knows how to interpret the data (numbers)

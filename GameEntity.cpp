@@ -1,9 +1,9 @@
 #include "GameEntity.h"
 
-GameEntity::GameEntity( Mesh * m )
+GameEntity::GameEntity( Mesh * m , Material * mat)
 {
 	mesh = m;
-
+	material = mat;
 }
 
 Mesh* GameEntity::GetMesh()
@@ -18,9 +18,12 @@ Transform* GameEntity::GetTransform()
 
 void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Buffer> buffer, UINT stride, UINT offset, Camera * camera )
 {
+	context->VSSetShader( material->GetVertexShader().Get(), 0, 0);
+	context->PSSetShader( material->GetPixelShader().Get(), 0, 0);
+
 	// Vertex Shader data struct
 	VertexShaderExternalData vsData;
-	vsData.colorTint = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	vsData.colorTint = material->GetColorTint();
 	vsData.worldMatrix = transform.GetWorldMatrix();
 	vsData.projMatrix = camera->GetProjMatrix();
 	vsData.viewMatrix = camera->GetViewMatrix();

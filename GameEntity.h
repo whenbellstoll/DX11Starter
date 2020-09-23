@@ -3,15 +3,17 @@
 #include "Mesh.h"
 #include "BufferStructs.h"
 #include "Camera.h"
+#include "Material.h"
 #include <DirectXMath.h>
 class GameEntity
 {
 	Transform transform;
 	Mesh* mesh;
+	Material* material;
 
 public:
 	// Constructor
-	GameEntity(Mesh* m);
+	GameEntity(Mesh* m, Material * mat);
 
 	// Getters
 	Mesh* GetMesh();
