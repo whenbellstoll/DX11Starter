@@ -2,18 +2,20 @@
 #include <DirectXMath.h>
 #include <wrl/client.h>
 #include "DXCore.h"
+#include "SimpleShader.h"
+
 class Material
 {
 	// Fields
 	DirectX::XMFLOAT4 colorTint;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+	SimpleVertexShader* vertexShader;
+	SimplePixelShader* pixelShader;
 public:	
 	// Constructor
-	Material(DirectX::XMFLOAT4 color, Microsoft::WRL::ComPtr<ID3D11PixelShader> pS, Microsoft::WRL::ComPtr<ID3D11VertexShader> vS);
+	Material(DirectX::XMFLOAT4 color, SimplePixelShader* pS, SimpleVertexShader* vS);
 	// Getters
 	DirectX::XMFLOAT4 GetColorTint();
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> GetPixelShader();
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> GetVertexShader();
+	SimplePixelShader* GetPixelShader();
+	SimpleVertexShader* GetVertexShader();
 };
 

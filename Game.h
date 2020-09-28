@@ -5,6 +5,7 @@
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include "GameEntity.h"
 #include "Camera.h"
+#include "SimpleShader.h"
 
 class Game 
 	: public DXCore
@@ -48,12 +49,12 @@ private:
 
 	Material* defaultMaterial = nullptr;
 	Material* redMaterial = nullptr;
-	// Buffer to Hold VertexShader external data
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
+
+	SimpleVertexShader* vertexShader = nullptr;
+	SimplePixelShader* pixelShader = nullptr;
+
 
 	// Shaders and shader-related constructs
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
 };

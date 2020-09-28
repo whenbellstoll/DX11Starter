@@ -20,6 +20,6 @@ public:
 	Transform* GetTransform();
 
 	// Draw Method
-	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Buffer> buffer, UINT stride, UINT offset, Camera * camera);
+	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT stride, UINT offset, Camera * camera);
 };
 
