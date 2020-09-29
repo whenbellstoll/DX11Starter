@@ -167,7 +167,7 @@ void Game::CreateBasicGeometry()
 
 	//create Mesh objects
 	triangle = new Mesh(vertices, 3, indices, 3, device);
-	topHat = new Mesh(hat, 6, hatI, 12, device);
+	topHat = new Mesh(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	cubeMesh = new Mesh(cube, 8, cubeI, 36, device);
 
 	// create Material
