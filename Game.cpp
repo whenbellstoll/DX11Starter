@@ -107,12 +107,11 @@ void Game::CreateBasicGeometry()
 {
 	// Create some temporary variables to represent colors
 	// - Not necessary, just makes things more readable
-	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	XMFLOAT4 black = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	XMFLOAT4 white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	XMFLOAT4 pink = XMFLOAT4(0.15f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT3 red = XMFLOAT3(0.0f, 0.0f, -1.0f);
+	XMFLOAT3 black = red;
+	XMFLOAT3 white = red;
+
+	XMFLOAT2 UV = XMFLOAT2(0, 0);
 
 	// Set up the vertices of the triangle we would like to draw
 	// - We're going to copy this array, exactly as it exists in memory
@@ -128,9 +127,9 @@ void Game::CreateBasicGeometry()
 	//    since we're describing the triangle in terms of the window itself
 	Vertex vertices[] =
 	{
-		{ XMFLOAT3(+0.8f, +0.25f, +0.0f), red },
-		{ XMFLOAT3(+0.95f, -0.15f, +0.0f), blue },
-		{ XMFLOAT3(+0.75f, -0.05f, +0.0f), green },
+		{ XMFLOAT3(+0.8f, +0.25f, +0.0f), red, UV },
+		{ XMFLOAT3(+0.95f, -0.15f, +0.0f), red, UV },
+		{ XMFLOAT3(+0.75f, -0.05f, +0.0f), red, UV },
 	};
 
 	// Set up the indices, which tell us which vertices to use and in which order
@@ -142,12 +141,12 @@ void Game::CreateBasicGeometry()
 
 	Vertex hat[] =
 	{
-		{ XMFLOAT3(-0.15f, +0.35f, +0.0f), black },
-		{ XMFLOAT3(+0.15f, -0.35f, +0.0f), black },
-		{ XMFLOAT3(-0.15f, -0.35f, +0.0f), black },
-		{ XMFLOAT3(+0.15f, +0.35f, +0.0f), black },
-		{ XMFLOAT3(+0.30f, -0.50f, +0.0f), black },
-		{ XMFLOAT3(-0.30f, -0.50f, +0.0f), black },
+		{ XMFLOAT3(-0.15f, +0.35f, +0.0f), red, UV },
+		{ XMFLOAT3(+0.15f, -0.35f, +0.0f), red, UV },
+		{ XMFLOAT3(-0.15f, -0.35f, +0.0f), black, UV },
+		{ XMFLOAT3(+0.15f, +0.35f, +0.0f), black, UV },
+		{ XMFLOAT3(+0.30f, -0.50f, +0.0f), black, UV },
+		{ XMFLOAT3(-0.30f, -0.50f, +0.0f), black, UV },
 	};
 	unsigned int hatI[] = { 0, 1, 2, 3, 1, 0, 2, 1, 5, 4, 5, 1 };
 
@@ -155,14 +154,14 @@ void Game::CreateBasicGeometry()
 	// Getting ambitious, making a 3D object
 	Vertex cube[] =
 	{
-		{ XMFLOAT3(-0.75f, +0.35f, +0.24f), white },
-		{ XMFLOAT3(-0.75f, +0.10f, +0.24f), white },
-		{ XMFLOAT3(-0.62f, +0.45f, +0.36f), red },
-		{ XMFLOAT3(-0.62f, +0.10f, +0.36f), white },
-		{ XMFLOAT3(-0.62f, +0.35f, +0.12f), white },
-		{ XMFLOAT3(-0.62f, +0.00f, +0.12f), red },
-		{ XMFLOAT3(-0.50f, +0.35f, +0.24f), white },
-		{ XMFLOAT3(-0.50f, +0.10f, +0.24f), white },
+		{ XMFLOAT3(-0.75f, +0.35f, +0.24f), white, UV },
+		{ XMFLOAT3(-0.75f, +0.10f, +0.24f), white, UV },
+		{ XMFLOAT3(-0.62f, +0.45f, +0.36f), red, UV },
+		{ XMFLOAT3(-0.62f, +0.10f, +0.36f), white, UV },
+		{ XMFLOAT3(-0.62f, +0.35f, +0.12f), white, UV },
+		{ XMFLOAT3(-0.62f, +0.00f, +0.12f), red, UV },
+		{ XMFLOAT3(-0.50f, +0.35f, +0.24f), white, UV },
+		{ XMFLOAT3(-0.50f, +0.10f, +0.24f), white, UV },
 	};
 	unsigned int cubeI[] = { 0, 1, 2, 2, 1, 3, 2, 3, 7, 6, 2, 7, 4, 6, 7, 4, 7, 5, 0, 4, 5, 0, 5, 1, 2, 6, 4, 2, 4, 0, 3, 7, 5, 3, 5, 1 };
 
@@ -172,8 +171,8 @@ void Game::CreateBasicGeometry()
 	cubeMesh = new Mesh(cube, 8, cubeI, 36, device);
 
 	// create Material
-	defaultMaterial = new Material(white, pixelShader, vertexShader);
-	redMaterial = new Material(red, pixelShader, vertexShader);
+	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader);
+	redMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShader, vertexShader);
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
 	topHatTwo = new GameEntity(topHat, redMaterial);
