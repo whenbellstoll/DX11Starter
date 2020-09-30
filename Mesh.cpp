@@ -3,7 +3,7 @@
 
 Mesh::Mesh()
 {
-	index = 0;
+	index = 0; 
 }
 
 Mesh::Mesh( Vertex v[], int vIndex, unsigned int indices[], int iIndex, Microsoft::WRL::ComPtr<ID3D11Device> device)

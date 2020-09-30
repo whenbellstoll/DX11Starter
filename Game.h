@@ -6,6 +6,7 @@
 #include "GameEntity.h"
 #include "Camera.h"
 #include "SimpleShader.h"
+#include "Lights.h"
 
 class Game 
 	: public DXCore
@@ -53,6 +54,9 @@ private:
 	SimpleVertexShader* vertexShader = nullptr;
 	SimplePixelShader* pixelShader = nullptr;
 
+	DirectionalLight light = {};
+	DirectionalLight lightTwo = {};
+	DirectionalLight lightThree = {};
 
 	// Shaders and shader-related constructs
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;

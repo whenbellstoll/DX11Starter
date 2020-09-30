@@ -5,6 +5,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include <d3dcompiler.h>
 
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -82,6 +83,20 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	camera = new Camera(DirectX::XMFLOAT3(0.0f, 0.0f, -5.0f), 90.0f, 0.1f, 300.0f);
+	light = DirectionalLight();
+	light.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
+	light.diffuseColor = DirectX::XMFLOAT3(0.5f, 1.0f, 0.5f);
+	light.direction = DirectX::XMFLOAT3(-1.0f, 0, 0);
+
+	lightTwo = DirectionalLight();
+	lightTwo.ambientColor = DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f);
+	lightTwo.diffuseColor = DirectX::XMFLOAT3(0.5f, 0.25f, 0.5f);
+	lightTwo.direction = DirectX::XMFLOAT3(1.0f, 0, 0);
+
+	lightThree = DirectionalLight();
+	lightThree.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
+	lightThree.diffuseColor = DirectX::XMFLOAT3(0.5f, 0.5f, 1.0f);
+	lightThree.direction = DirectX::XMFLOAT3(0, 1, 0);
 }
 
 // --------------------------------------------------------
@@ -113,62 +128,11 @@ void Game::CreateBasicGeometry()
 
 	XMFLOAT2 UV = XMFLOAT2(0, 0);
 
-	// Set up the vertices of the triangle we would like to draw
-	// - We're going to copy this array, exactly as it exists in memory
-	//    over to a DirectX-controlled data structure (the vertex buffer)
-	// - Note: Since we don't have a camera or really any concept of
-	//    a "3d world" yet, we're simply describing positions within the
-	//    bounds of how the rasterizer sees our screen: [-1 to +1] on X and Y
-	// - This means (0,0) is at the very center of the screen.
-	// - These are known as "Normalized Device Coordinates" or "Homogeneous 
-	//    Screen Coords", which are ways to describe a position without
-	//    knowing the exact size (in pixels) of the image/window/etc.  
-	// - Long story short: Resizing the window also resizes the triangle,
-	//    since we're describing the triangle in terms of the window itself
-	Vertex vertices[] =
-	{
-		{ XMFLOAT3(+0.8f, +0.25f, +0.0f), red, UV },
-		{ XMFLOAT3(+0.95f, -0.15f, +0.0f), red, UV },
-		{ XMFLOAT3(+0.75f, -0.05f, +0.0f), red, UV },
-	};
-
-	// Set up the indices, which tell us which vertices to use and in which order
-	// - This is somewhat redundant for just 3 vertices (it's a simple example)
-	// - Indices are technically not required if the vertices are in the buffer 
-	//    in the correct order and each one will be used exactly once
-
-	unsigned int indices[] = { 0, 1, 2 };
-
-	Vertex hat[] =
-	{
-		{ XMFLOAT3(-0.15f, +0.35f, +0.0f), red, UV },
-		{ XMFLOAT3(+0.15f, -0.35f, +0.0f), red, UV },
-		{ XMFLOAT3(-0.15f, -0.35f, +0.0f), black, UV },
-		{ XMFLOAT3(+0.15f, +0.35f, +0.0f), black, UV },
-		{ XMFLOAT3(+0.30f, -0.50f, +0.0f), black, UV },
-		{ XMFLOAT3(-0.30f, -0.50f, +0.0f), black, UV },
-	};
-	unsigned int hatI[] = { 0, 1, 2, 3, 1, 0, 2, 1, 5, 4, 5, 1 };
-
-
-	// Getting ambitious, making a 3D object
-	Vertex cube[] =
-	{
-		{ XMFLOAT3(-0.75f, +0.35f, +0.24f), white, UV },
-		{ XMFLOAT3(-0.75f, +0.10f, +0.24f), white, UV },
-		{ XMFLOAT3(-0.62f, +0.45f, +0.36f), red, UV },
-		{ XMFLOAT3(-0.62f, +0.10f, +0.36f), white, UV },
-		{ XMFLOAT3(-0.62f, +0.35f, +0.12f), white, UV },
-		{ XMFLOAT3(-0.62f, +0.00f, +0.12f), red, UV },
-		{ XMFLOAT3(-0.50f, +0.35f, +0.24f), white, UV },
-		{ XMFLOAT3(-0.50f, +0.10f, +0.24f), white, UV },
-	};
-	unsigned int cubeI[] = { 0, 1, 2, 2, 1, 3, 2, 3, 7, 6, 2, 7, 4, 6, 7, 4, 7, 5, 0, 4, 5, 0, 5, 1, 2, 6, 4, 2, 4, 0, 3, 7, 5, 3, 5, 1 };
 
 	//create Mesh objects
-	triangle = new Mesh(vertices, 3, indices, 3, device);
+	triangle = new Mesh(GetFullPathTo("../../Assets/Models/cone.obj").c_str(), device);
 	topHat = new Mesh(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
-	cubeMesh = new Mesh(cube, 8, cubeI, 36, device);
+	cubeMesh = new Mesh(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
 
 	// create Material
 	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader);
@@ -213,10 +177,11 @@ void Game::Update(float deltaTime, float totalTime)
 
 	// cube one rotates about the x-axis
 	cubeOne->GetTransform()->Rotate(0.1f * deltaTime, 0, 0);
+	cubeOne->GetTransform()->MoveAbsolute(-0.03f * deltaTime, 0, 0);
 
 	// cube two rotates the other way and moves right
 	cubeTwo->GetTransform()->Rotate(-0.1f * deltaTime, 0, 0);
-	cubeTwo->GetTransform()->MoveAbsolute( 0.01f * deltaTime, 0, 0);
+	cubeTwo->GetTransform()->MoveAbsolute( 0.03f * deltaTime, 0, 0);
 
 	// top Hat one rotates about the z
 	topHatOne->GetTransform()->Rotate(0, 0, 0.1f * deltaTime);
@@ -229,12 +194,12 @@ void Game::Update(float deltaTime, float totalTime)
 		topHatOne->GetTransform()->SetScale(1, 1, 1);
 	}
 	// top hat two moves left and away
-	topHatTwo->GetTransform()->MoveAbsolute( -0.01f * deltaTime, 0, 0.01f * deltaTime);
+	topHatTwo->GetTransform()->MoveAbsolute( -0.05f * deltaTime, 0, 0.05f * deltaTime);
 	
 
 	// triangle just kinda schmoves
 	triaOne->GetTransform()->Rotate(0, 0.1f * deltaTime, 0);
-
+	triaOne->GetTransform()->MoveAbsolute( 0.05f * deltaTime, 0, 0);
 
 
 }
@@ -277,6 +242,26 @@ void Game::Draw(float deltaTime, float totalTime)
 	// - However, this isn't always the case (but might be for this course)
 	context->IASetInputLayout(inputLayout.Get());
 
+	
+
+	// Set the pixel shader with the directional light
+	pixelShader->SetData(
+		"directionalLight",
+		&light,
+		sizeof(DirectionalLight)
+	);
+	pixelShader->SetData(
+		"lightTwo",
+		&lightTwo,
+		sizeof(DirectionalLight)
+	);
+	pixelShader->SetData(
+		"lightThree",
+		&lightThree,
+		sizeof(DirectionalLight)
+	);
+	pixelShader->CopyAllBufferData();
+
 
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
@@ -286,9 +271,6 @@ void Game::Draw(float deltaTime, float totalTime)
 	//    in a larger application/game
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	
-	
-
 	// Finally do the actual drawing
 	//  - Do this ONCE PER OBJECT you intend to draw
 	topHatOne->Draw(context, stride, offset, camera);
