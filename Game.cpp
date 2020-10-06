@@ -100,6 +100,12 @@ void Game::Init()
 	lightThree.diffuseColor = DirectX::XMFLOAT3(0.5f, 0.5f, 1.0f);
 	lightThree.direction = DirectX::XMFLOAT3(0, 1, 0);
 	lightThree.type = 0;
+
+	pointLight = DirectionalLight();
+	pointLight.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
+	pointLight.diffuseColor = DirectX::XMFLOAT3(0.75f, 0.2f, 0.1f);
+	pointLight.direction = DirectX::XMFLOAT3(2, 1, 1);
+	pointLight.type = 1;
 }
 
 // --------------------------------------------------------
@@ -261,6 +267,11 @@ void Game::Draw(float deltaTime, float totalTime)
 	pixelShader->SetData(
 		"lightThree",
 		&lightThree,
+		sizeof(DirectionalLight)
+	);
+	pixelShader->SetData(
+		"pointLight",
+		&pointLight,
 		sizeof(DirectionalLight)
 	);
 	pixelShader->CopyAllBufferData();
