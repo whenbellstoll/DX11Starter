@@ -21,6 +21,7 @@ struct DirectionalLight
 	float3 ambientColor;
 	float3 diffuseColor;
 	float3 direction;
+	int type;
 };
 
 cbuffer ExternalData : register(b0)
@@ -36,8 +37,7 @@ float3 directionalLightCalculation( VertexToPixel i, DirectionalLight dl)
 	float3 iNormal = normalize(i.normal);
 	float3 toTheLight = normalize(-(dl.direction));
 	toTheLight = dot(toTheLight, iNormal);
-	float3 finalColor = toTheLight * dl.diffuseColor * ((float3)i.color + dl.ambientColor) * (float3)i.color;
-	finalColor = saturate(finalColor);
+	float3 finalColor = dl.diffuseColor * saturate(toTheLight);
 	return finalColor;
 }
 
@@ -60,6 +60,10 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 lTwo = directionalLightCalculation(input, lightTwo);
 	float3 lThree = directionalLightCalculation(input, lightThree);
 	float3 finalColor = lOne + lTwo + lThree;
-	finalColor = saturate(finalColor);
+
+	// ambient light
+	float3 ambientLight = (directionalLight.ambientColor + lightTwo.ambientColor + lightThree.ambientColor) / 3;
+	finalColor = finalColor + ambientLight;
+
 	return float4(finalColor, 1);
 }

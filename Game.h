@@ -58,6 +58,8 @@ private:
 	DirectionalLight lightTwo = {};
 	DirectionalLight lightThree = {};
 
+	DirectionalLight pointLight = {};
+	DirectionalLight pointLightTwo = {};
 	// Shaders and shader-related constructs
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 

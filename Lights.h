@@ -8,4 +8,5 @@ struct DirectionalLight
 	DirectX::XMFLOAT3 diffuseColor;
 	float paddingTwo;
 	DirectX::XMFLOAT3 direction;
+	int type;
 };

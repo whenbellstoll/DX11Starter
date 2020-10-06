@@ -87,16 +87,19 @@ void Game::Init()
 	light.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
 	light.diffuseColor = DirectX::XMFLOAT3(0.5f, 1.0f, 0.5f);
 	light.direction = DirectX::XMFLOAT3(-1.0f, 0, 0);
+	light.type = 0;
 
 	lightTwo = DirectionalLight();
-	lightTwo.ambientColor = DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f);
+	lightTwo.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
 	lightTwo.diffuseColor = DirectX::XMFLOAT3(0.5f, 0.25f, 0.5f);
 	lightTwo.direction = DirectX::XMFLOAT3(1.0f, 0, 0);
+	lightTwo.type = 0;
 
 	lightThree = DirectionalLight();
 	lightThree.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
 	lightThree.diffuseColor = DirectX::XMFLOAT3(0.5f, 0.5f, 1.0f);
 	lightThree.direction = DirectX::XMFLOAT3(0, 1, 0);
+	lightThree.type = 0;
 }
 
 // --------------------------------------------------------
