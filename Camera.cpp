@@ -24,6 +24,11 @@ DirectX::XMFLOAT4X4 Camera::GetProjMatrix()
     return projMatrix;
 }
 
+DirectX::XMFLOAT3 Camera::GetPosition()
+{
+    return transform.GetPosition();
+}
+
 void Camera::UpdateProjectionMatrix(float aspectRatio)
 {
     XMStoreFloat4x4(&projMatrix, DirectX::XMMatrixPerspectiveFovLH( 1.0f, aspectRatio, nearPlaneDistance, farPlaneDistance) );

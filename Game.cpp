@@ -143,15 +143,33 @@ void Game::CreateBasicGeometry()
 	topHat = new Mesh(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	cubeMesh = new Mesh(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
 
+	//Load Textures
+	HRESULT fire = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/hotnspicy.png").c_str(), nullptr, srvFire.GetAddressOf() );
+	HRESULT cursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cursio.jpg").c_str(), nullptr, srvCurse.GetAddressOf());;
+
+	D3D11_SAMPLER_DESC sampleDesc = { };
+	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampleDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampleDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampleDesc.MaxLOD = 16;
+
+	device->CreateSamplerState(&sampleDesc, sampleState.GetAddressOf());
+
 	// create Material
-	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader);
-	redMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShader, vertexShader);
+	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 5.0f, 3.0f, srvFire, sampleState);
+	redMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShader, vertexShader, 100.0f, 3.0f, srvCurse, sampleState);
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
 	topHatTwo = new GameEntity(topHat, redMaterial);
 	cubeOne = new GameEntity(cubeMesh, defaultMaterial);
 	cubeTwo = new GameEntity(cubeMesh, redMaterial);
 	triaOne = new GameEntity(triangle, defaultMaterial);
+
+	topHatOne->GetTransform()->SetPosition(4, 0, 0);
+	topHatTwo->GetTransform()->SetPosition(-4, 0, 0);
+	cubeOne->GetTransform()->SetPosition(1, 2, 0);
+	cubeTwo->GetTransform()->SetPosition(-1, -2, 0);
 }
 
 
@@ -273,6 +291,11 @@ void Game::Draw(float deltaTime, float totalTime)
 		"pointLight",
 		&pointLight,
 		sizeof(DirectionalLight)
+	);
+	pixelShader->SetData(
+		"cameraPosition",
+		&camera->GetPosition(),
+		sizeof(DirectX::XMFLOAT3)
 	);
 	pixelShader->CopyAllBufferData();
 

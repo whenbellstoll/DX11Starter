@@ -15,6 +15,7 @@ struct VertexToPixel
 	float4 color		: COLOR;
 	float3 normal		: NORMAL;
 	float4 worldPos		: POSITION;
+	float2 uv			: TEXCOORD;
 };
 
 struct DirectionalLight
@@ -31,15 +32,29 @@ cbuffer ExternalData : register(b0)
 	DirectionalLight lightTwo;
 	DirectionalLight lightThree;
 	DirectionalLight pointLight;
+	float specularValue;
+	float specularExpo;
+	float3 cameraPosition;
+	//Texture2D diffuseTexture : register(t0);// "t" registers
+	//SamplerState samplerOptions: register(s0);// "s" registers
 }
 
 // helper Method
+float specCalculation(VertexToPixel i, float3 direction)
+{
+	float3 V = normalize(cameraPosition - i.worldPos);
+	float3 R = reflect(direction, i.normal);
+	float spec = pow(saturate(dot(R, V)), specularExpo) * specularValue;
+	return spec;
+}
+
 float3 directionalLightCalculation( VertexToPixel i, DirectionalLight dl)
 {
 	float3 iNormal = normalize(i.normal);
 	float3 toTheLight = normalize(-(dl.direction));
 	toTheLight = dot(toTheLight, iNormal);
 	float3 finalColor = dl.diffuseColor * saturate(toTheLight);
+	finalColor = finalColor * specCalculation(i, toTheLight);
 	return finalColor;
 }
 
@@ -50,8 +65,12 @@ float3 pointLightCalculation(VertexToPixel i, DirectionalLight dl)
 	float3 toTheLight = dl.direction - (float3)i.worldPos;
 	toTheLight = dot(toTheLight, iNormal);
 	float3 finalColor = dl.diffuseColor * saturate(toTheLight);
+	finalColor = finalColor * specCalculation(i, toTheLight);
 	return finalColor;
 }
+
+
+
 // --------------------------------------------------------
 // The entry point (main method) for our pixel shader
 // 

@@ -20,6 +20,7 @@ public:
 	// Getters
 	DirectX::XMFLOAT4X4 GetViewMatrix();
 	DirectX::XMFLOAT4X4 GetProjMatrix();
+	DirectX::XMFLOAT3 GetPosition();
 
 	void UpdateProjectionMatrix( float aspectRatio );
 	void UpdateViewMatrix();

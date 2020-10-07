@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "SimpleShader.h"
 #include "Lights.h"
+#include "WICTextureLoader.h"
 
 class Game 
 	: public DXCore
@@ -60,7 +61,10 @@ private:
 
 	DirectionalLight pointLight = {};
 	DirectionalLight pointLightTwo = {};
+
 	// Shaders and shader-related constructs
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
-
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvFire;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvCurse;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampleState;
 };

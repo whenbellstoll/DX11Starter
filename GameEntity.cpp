@@ -28,9 +28,16 @@ void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT 
 	vs->SetMatrix4x4("view", camera->GetViewMatrix() );
 	vs->SetMatrix4x4("proj", camera->GetProjMatrix() );
 
+
 	// Map the buffer data
 	vs->CopyAllBufferData();
 
+
+	// Pixel Shader struct
+	SimplePixelShader* ps = material->GetPixelShader();
+	ps->SetFloat("specularValue", material->GetSpec());
+	ps->SetFloat("specularExpo", material->GetSpecExpo());
+	ps->CopyAllBufferData();
 
 	// Set the buffer
 	context->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &stride, &offset);
