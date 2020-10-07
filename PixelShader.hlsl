@@ -46,7 +46,7 @@ SamplerState samplerOptions: register(s0);// "s" registers
 // helper Method
 float specCalculation(VertexToPixel i, float3 direction)
 {
-	float3 V = normalize(cameraPosition - i.worldPos);
+	float3 V = normalize(cameraPosition - (float3)i.worldPos);
 	float3 R = reflect(direction, i.normal);
 	float spec = pow(saturate(dot(R, V)), specularExpo) * specularValue;
 	return spec;
