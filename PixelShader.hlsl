@@ -35,9 +35,13 @@ cbuffer ExternalData : register(b0)
 	float specularValue;
 	float specularExpo;
 	float3 cameraPosition;
-	//Texture2D diffuseTexture : register(t0);// "t" registers
-	//SamplerState samplerOptions: register(s0);// "s" registers
+	
+	
 }
+
+Texture2D diffuseTexture : register(t0);// "t" registers
+SamplerState samplerOptions: register(s0);// "s" registers
+
 
 // helper Method
 float specCalculation(VertexToPixel i, float3 direction)
@@ -86,7 +90,9 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// - This color (like most values passing through the rasterizer) is 
 	//   interpolated for each pixel between the corresponding vertices 
 	//   of the triangle we're rendering
-	float3 finalColor = directionalLightCalculation(input, directionalLight);
+	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
+
+	float3 finalColor = surfaceColor + directionalLightCalculation(input, directionalLight);
 	finalColor = finalColor + directionalLightCalculation(input, lightTwo);
 	finalColor = finalColor + directionalLightCalculation(input, lightThree);
 	finalColor = finalColor + pointLightCalculation(input, pointLight);

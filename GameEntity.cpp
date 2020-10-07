@@ -37,6 +37,8 @@ void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT 
 	SimplePixelShader* ps = material->GetPixelShader();
 	ps->SetFloat("specularValue", material->GetSpec());
 	ps->SetFloat("specularExpo", material->GetSpecExpo());
+	ps->SetSamplerState("samplerOptions", material->GetSampleState().Get() );
+	ps->SetShaderResourceView("diffuseTexture", material->GetSRV().Get());
 	ps->CopyAllBufferData();
 
 	// Set the buffer

@@ -75,7 +75,7 @@ VertexToPixel main( VertexShaderInput input )
 
 	// Set the normal
 	output.normal = mul((float3x3)world, input.normal );
-
+	output.uv = input.uv;
 	// Set the world Position
 	output.worldPos = mul(world, float4(input.position, 1.0f));
 	// Whatever we return will make its way through the pipeline to the
