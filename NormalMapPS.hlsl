@@ -13,6 +13,7 @@ cbuffer ExternalData : register(b0)
 }
 
 Texture2D diffuseTexture : register(t0);// "t" registers
+Texture2D normalMap : register(t1);
 SamplerState samplerOptions: register(s0);// "s" registers
 
 
@@ -25,13 +26,23 @@ SamplerState samplerOptions: register(s0);// "s" registers
 //    "put the output of this into the current render target"
 // - Named "main" because that's the default the shader compiler looks for
 // --------------------------------------------------------
-float4 main(VertexToPixel input) : SV_TARGET
+float4 main(VertexToPixelNormalMap input) : SV_TARGET
 {
-
+	// calculate normal map and surface color from textures
+	float3 unpackedNormal = normalMap.Sample(samplerOptions, input.uv).rgb * 2 - 1;
 	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 
 	//normalize the normal
 	input.normal = normalize(input.normal);
+	input.tangent = normalize(input.tangent);
+
+	float3 N = input.normal;
+	float3 T = input.tangent;
+	T = normalize(T - N * dot(T, N)); // Gram-Schmidt orthogonalization
+	float3 B = cross(T, N); // Bi-tangent
+	float3x3 TBN = float3x3(T, B, N);
+
+	input.normal = mul(unpackedNormal, TBN); // order matters because matrix
 
 	float3 finalColor = surfaceColor + directionalLightCalculation(input, directionalLight, surfaceColor, cameraPosition, specularExpo);
 	finalColor = finalColor + directionalLightCalculation(input, lightTwo, surfaceColor, cameraPosition, specularExpo);
