@@ -48,29 +48,27 @@ float specCalculation(VertexToPixel i, float3 direction)
 {
 	float3 V = normalize(cameraPosition - (float3)i.worldPos);
 	float3 R = reflect(direction, i.normal);
-	float spec = pow(saturate(dot(R, V)), specularExpo) * specularValue;
-	return spec;
+	return pow(saturate(dot(R, V)), specularExpo);
 }
 
-float3 directionalLightCalculation( VertexToPixel i, DirectionalLight dl)
+float3 directionalLightCalculation( VertexToPixel i, DirectionalLight dl, float3 surfaceColor)
 {
 	float3 iNormal = normalize(i.normal);
-	float3 toTheLight = normalize(-(dl.direction));
-	toTheLight = dot(toTheLight, iNormal);
-	float3 finalColor = dl.diffuseColor * saturate(toTheLight);
-	finalColor = finalColor * specCalculation(i, toTheLight);
-	return finalColor;
+	float3 toTheLight = normalize(dl.direction);
+	float diffuse = saturate(dot(iNormal, toTheLight));
+	float spec = specCalculation(i, -toTheLight); 
+	return (diffuse * dl.diffuseColor * surfaceColor + spec * dl.diffuseColor);
+
 }
 
-float3 pointLightCalculation(VertexToPixel i, DirectionalLight dl)
+float3 pointLightCalculation(VertexToPixel i, DirectionalLight dl, float3 surfaceColor)
 {
 	// Direction of a point light = position
 	float3 iNormal = normalize(i.normal);
-	float3 toTheLight = dl.direction - (float3)i.worldPos;
-	toTheLight = dot(toTheLight, iNormal);
-	float3 finalColor = dl.diffuseColor * saturate(toTheLight);
-	finalColor = finalColor * specCalculation(i, toTheLight);
-	return finalColor;
+	float3 toTheLight = normalize( dl.direction - (float3)i.worldPos);
+	float diffuse = saturate(dot(toTheLight, iNormal));
+	float spec = specCalculation(i, -toTheLight);
+	return (diffuse * dl.diffuseColor * surfaceColor + spec * dl.diffuseColor);
 }
 
 
@@ -92,13 +90,13 @@ float4 main(VertexToPixel input) : SV_TARGET
 	//   of the triangle we're rendering
 	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 
-	float3 finalColor = surfaceColor + directionalLightCalculation(input, directionalLight);
-	finalColor = finalColor + directionalLightCalculation(input, lightTwo);
-	finalColor = finalColor + directionalLightCalculation(input, lightThree);
-	finalColor = finalColor + pointLightCalculation(input, pointLight);
+	float3 finalColor = surfaceColor + directionalLightCalculation(input, directionalLight, surfaceColor);
+	finalColor = finalColor + directionalLightCalculation(input, lightTwo, surfaceColor);
+	finalColor = finalColor + directionalLightCalculation(input, lightThree, surfaceColor);
+	finalColor = finalColor + pointLightCalculation(input, pointLight, surfaceColor);
 
 	// ambient light
-	float3 ambientLight = (directionalLight.ambientColor + lightTwo.ambientColor + lightThree.ambientColor) / 3;
+	float3 ambientLight = directionalLight.ambientColor;
 	finalColor = finalColor + ambientLight;
 
 	return float4(finalColor, 1);

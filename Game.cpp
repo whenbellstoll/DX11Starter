@@ -85,8 +85,8 @@ void Game::Init()
 	camera = new Camera(DirectX::XMFLOAT3(0.0f, 0.0f, -5.0f), 90.0f, 0.1f, 300.0f);
 	light = DirectionalLight();
 	light.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
-	light.diffuseColor = DirectX::XMFLOAT3(0.5f, 1.0f, 0.5f);
-	light.direction = DirectX::XMFLOAT3(-1.0f, 0, 0);
+	light.diffuseColor = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	light.direction = DirectX::XMFLOAT3(-1.0f, 1.0f, 0);
 	light.type = 0;
 
 	lightTwo = DirectionalLight();
@@ -103,8 +103,8 @@ void Game::Init()
 
 	pointLight = DirectionalLight();
 	pointLight.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
-	pointLight.diffuseColor = DirectX::XMFLOAT3(0.75f, 0.2f, 0.1f);
-	pointLight.direction = DirectX::XMFLOAT3(2, 1, 1);
+	pointLight.diffuseColor = DirectX::XMFLOAT3(0.0f, 1.0f, 0.1f);
+	pointLight.direction = DirectX::XMFLOAT3(5, 1, 0);
 	pointLight.type = 1;
 }
 
@@ -157,8 +157,8 @@ void Game::CreateBasicGeometry()
 	device->CreateSamplerState(&sampleDesc, sampleState.GetAddressOf());
 
 	// create Material
-	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 5.0f, 3.0f, srvFire, sampleState);
-	redMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShader, vertexShader, 100.0f, 3.0f, srvCurse, sampleState);
+	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 5.0f, 64.0f, srvFire, sampleState);
+	redMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShader, vertexShader, 100.0f, 64.0f, srvCurse, sampleState);
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
 	topHatTwo = new GameEntity(topHat, redMaterial);
@@ -203,7 +203,7 @@ void Game::Update(float deltaTime, float totalTime)
 	// Update the objects
 
 	// cube one rotates about the x-axis
-	cubeOne->GetTransform()->Rotate(0.1f * deltaTime, 0, 0);
+	cubeOne->GetTransform()->Rotate(0, 0.1f * deltaTime, 0);
 	cubeOne->GetTransform()->MoveAbsolute(-0.03f * deltaTime, 0, 0);
 
 	// cube two rotates the other way and moves right

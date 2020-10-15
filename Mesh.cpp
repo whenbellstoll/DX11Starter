@@ -225,7 +225,7 @@ Mesh::~Mesh()
 
 Microsoft::WRL::ComPtr<ID3D11Buffer> Mesh::GetIndexBuffer()
 {
-	return indexBuffer;
+	return indexBuffer; 
 }
 
 int Mesh::GetIndexCount()
