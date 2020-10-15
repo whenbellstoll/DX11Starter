@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 
+
 class Mesh
 {
 public:
@@ -22,5 +23,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 	void CreateBuffers( Vertex * v, int vIndex, unsigned int* indices, int iIndex, Microsoft::WRL::ComPtr<ID3D11Device> device);
+	void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);
 };
 
