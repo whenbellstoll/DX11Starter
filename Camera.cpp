@@ -51,7 +51,7 @@ void Camera::UpdateViewMatrix()
 void Camera::Update(float dt, HWND windowHandle)
 {
     // handle keyboard input
-    float movementSpeed = 0.3f;
+    float movementSpeed = 0.6f;
     if (GetAsyncKeyState( 'W' ) & 0x8000)
     {
         transform.MoveRelative(0, 0, movementSpeed * dt);

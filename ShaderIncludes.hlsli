@@ -89,4 +89,33 @@ float3 pointLightCalculation(VertexToPixel i, DirectionalLight dl, float3 surfac
 }
 
 
+float specCalculationN(VertexToPixelNormalMap i, float3 direction, float3 cameraPosition, float specExpo)
+{
+	float3 V = normalize(cameraPosition - (float3)i.worldPos);
+	float3 R = reflect(direction, i.normal);
+	return pow(saturate(dot(R, V)), specExpo);
+}
+
+float3 directionalLightCalculationN(VertexToPixelNormalMap i, DirectionalLight dl, float3 surfaceColor, float3 cameraPosition, float specExpo)
+{
+	float3 iNormal = i.normal;
+	float3 toTheLight = normalize(dl.direction);
+	float diffuse = saturate(dot(iNormal, toTheLight));
+	float spec = specCalculationN(i, -toTheLight, cameraPosition, specExpo);
+	spec *= any(diffuse);
+	return (diffuse * dl.diffuseColor * surfaceColor + spec * dl.diffuseColor);
+
+}
+
+float3 pointLightCalculationN(VertexToPixelNormalMap i, DirectionalLight dl, float3 surfaceColor, float3 cameraPosition, float specExpo)
+{
+	// Direction of a point light = position
+	float3 iNormal = i.normal;
+	float3 toTheLight = normalize(dl.direction - (float3)i.worldPos);
+	float diffuse = saturate(dot(toTheLight, iNormal));
+	float spec = specCalculationN(i, -toTheLight, cameraPosition, specExpo);
+	spec *= any(diffuse);
+	return (diffuse * dl.diffuseColor * surfaceColor + spec * dl.diffuseColor);
+}
+
 #endif

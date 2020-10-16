@@ -42,16 +42,19 @@ float4 main(VertexToPixelNormalMap input) : SV_TARGET
 	float3 B = cross(T, N); // Bi-tangent
 	float3x3 TBN = float3x3(T, B, N);
 
-	input.normal = mul(unpackedNormal, TBN); // order matters because matrix
+	input.normal = normalize( mul(unpackedNormal, TBN) ); // order matters because matrix
 
-	float3 finalColor = surfaceColor + directionalLightCalculation(input, directionalLight, surfaceColor, cameraPosition, specularExpo);
-	finalColor = finalColor + directionalLightCalculation(input, lightTwo, surfaceColor, cameraPosition, specularExpo);
-	finalColor = finalColor + directionalLightCalculation(input, lightThree, surfaceColor, cameraPosition, specularExpo);
-	finalColor = finalColor + pointLightCalculation(input, pointLight, surfaceColor, cameraPosition, specularExpo);
+
+	float3 finalColor = surfaceColor + directionalLightCalculationN(input, directionalLight, surfaceColor, cameraPosition, specularExpo);
+	finalColor = finalColor + directionalLightCalculationN(input, lightTwo, surfaceColor, cameraPosition, specularExpo);
+	finalColor = finalColor + directionalLightCalculationN(input, lightThree, surfaceColor, cameraPosition, specularExpo);
+	finalColor = finalColor + pointLightCalculationN(input, pointLight, surfaceColor, cameraPosition, specularExpo);
 
 	// ambient light
 	float3 ambientLight = directionalLight.ambientColor;
 	finalColor = finalColor + ambientLight;
 
 	return float4(finalColor, 1);
+
+	//return float4( cameraPosition, 1);
 }

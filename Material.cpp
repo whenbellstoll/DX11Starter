@@ -9,6 +9,20 @@ Material::Material(DirectX::XMFLOAT4 color, SimplePixelShader* pS, SimpleVertexS
     specularExpo = specularE;
     srv = sr;
     sampleState = samS;
+    normalMapBool = false;
+}
+
+Material::Material(DirectX::XMFLOAT4 color, SimplePixelShader* pS, SimpleVertexShader* vS, float specularV, float specularE, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sr, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> nm, Microsoft::WRL::ComPtr<ID3D11SamplerState> samS)
+{
+    colorTint = color;
+    pixelShader = pS;
+    vertexShader = vS;
+    specularValue = specularV;
+    specularExpo = specularE;
+    srv = sr;
+    sampleState = samS;
+    normalMap = nm;
+    normalMapBool = true;
 }
 
 DirectX::XMFLOAT4 Material::GetColorTint()
@@ -31,6 +45,11 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Material::GetSRV()
     return srv;
 }
 
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Material::GetNormal()
+{
+    return normalMap;
+}
+
 Microsoft::WRL::ComPtr<ID3D11SamplerState> Material::GetSampleState()
 {
     return sampleState;
@@ -44,4 +63,9 @@ float Material::GetSpec()
 float Material::GetSpecExpo()
 {
     return specularExpo;
+}
+
+bool Material::IsNormal()
+{
+    return normalMapBool;
 }

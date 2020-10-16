@@ -16,6 +16,11 @@ Transform* GameEntity::GetTransform()
 	return &transform;
 }
 
+Material* GameEntity::GetMaterial()
+{
+	return material;
+}
+
 void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT stride, UINT offset, Camera * camera )
 {
 	material->GetVertexShader()->SetShader();
@@ -39,6 +44,12 @@ void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT 
 	ps->SetFloat("specularExpo", material->GetSpecExpo());
 	ps->SetSamplerState("samplerOptions", material->GetSampleState().Get() );
 	ps->SetShaderResourceView("diffuseTexture", material->GetSRV().Get());
+
+	if (material->IsNormal())
+	{
+		ps->SetShaderResourceView("normalMap", material->GetNormal().Get());
+	}
+	
 	ps->CopyAllBufferData();
 
 	// Set the buffer

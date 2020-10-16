@@ -8,6 +8,10 @@ Mesh::Mesh()
 
 Mesh::Mesh( Vertex v[], int vIndex, unsigned int indices[], int iIndex, Microsoft::WRL::ComPtr<ID3D11Device> device)
 {
+
+	// Calculate out tangents
+	CalculateTangents(v, vIndex, indices, iIndex);
+
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.ByteWidth = sizeof(Vertex) * vIndex;       // vIndex number of vertices in the buffer
@@ -214,6 +218,8 @@ Mesh::Mesh(const char* file, Microsoft::WRL::ComPtr<ID3D11Device> device)
 	obj.close();
 
 	index = (int)indices.size();
+	// Calculate out tangents
+	CalculateTangents(&verts[0], (int)verts.size(), &indices[0], (int)indices.size());
 
 	CreateBuffers(&verts[0], (int)verts.size(), &indices[0], (int)indices.size(), device );
 	
@@ -235,8 +241,7 @@ int Mesh::GetIndexCount()
 
 void Mesh::CreateBuffers(Vertex* v, int vIndex, unsigned int* indices, int iIndex, Microsoft::WRL::ComPtr<ID3D11Device> device)
 {
-	// Calculate out tangents
-	CalculateTangents(v, vIndex, indices, iIndex);
+	
 
 	// Make Vertex Buffer
 	D3D11_BUFFER_DESC vbd;
@@ -353,7 +358,7 @@ void Mesh::CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices,
 		DirectX::XMVECTOR tangent = XMLoadFloat3(&verts[i].Tangent);
 
 		// Use Gram-Schmidt orthogonalize
-		tangent = DirectX::XMVector3Normalize( DirectX::XMVectorMultiply( DirectX::XMVectorSubtract(tangent, normal), DirectX::XMVector3Dot(normal, tangent)));
+		tangent = DirectX::XMVector3Normalize( DirectX::XMVectorSubtract(tangent, DirectX::XMVectorMultiply(  normal, DirectX::XMVector3Dot(normal, tangent))));
 
 		// Store the tangent
 		XMStoreFloat3(&verts[i].Tangent, tangent);

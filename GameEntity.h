@@ -18,6 +18,8 @@ public:
 	// Getters
 	Mesh* GetMesh();
 	Transform* GetTransform();
+	Material* GetMaterial();
+
 
 	// Draw Method
 	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT stride, UINT offset, Camera * camera);

@@ -9,8 +9,7 @@
 #include "Lights.h"
 #include "WICTextureLoader.h"
 
-class Game 
-	: public DXCore
+class Game	: public DXCore
 {
 
 public:
@@ -50,10 +49,13 @@ private:
 	Camera* camera = nullptr;
 
 	Material* defaultMaterial = nullptr;
-	Material* redMaterial = nullptr;
+	Material* defaultMaterialNormal = nullptr;
+	Material* cushionMaterial = nullptr;
 
 	SimpleVertexShader* vertexShader = nullptr;
 	SimplePixelShader* pixelShader = nullptr;
+	SimpleVertexShader* vertexShaderNormal = nullptr;
+	SimplePixelShader* pixelShaderNormal = nullptr;
 
 	DirectionalLight light = {};
 	DirectionalLight lightTwo = {};
@@ -66,5 +68,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvFire;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvCurse;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalFire;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalCushion;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampleState;
 };

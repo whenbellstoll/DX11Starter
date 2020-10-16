@@ -58,10 +58,13 @@ Game::~Game()
 	delete camera;
 
 	delete defaultMaterial;
-	delete redMaterial;
+	delete cushionMaterial;
+	delete defaultMaterialNormal;
 
 	delete vertexShader;
 	delete pixelShader;
+	delete vertexShaderNormal;
+	delete pixelShaderNormal;
 }
 
 // --------------------------------------------------------
@@ -120,6 +123,8 @@ void Game::LoadShaders()
 {
 	vertexShader = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShader.cso").c_str()); 
 	pixelShader = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShader.cso").c_str());
+	vertexShaderNormal = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapVS.cso").c_str());
+	pixelShaderNormal = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapPS.cso").c_str());
 }
 
 
@@ -145,7 +150,11 @@ void Game::CreateBasicGeometry()
 
 	//Load Textures
 	HRESULT fire = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/hotnspicy.png").c_str(), nullptr, srvFire.GetAddressOf() );
-	HRESULT cursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cursio.jpg").c_str(), nullptr, srvCurse.GetAddressOf());;
+	HRESULT cursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, srvCurse.GetAddressOf());;
+
+	//Load Normal Maps
+	HRESULT normfire = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, normalFire.GetAddressOf());
+	HRESULT normcursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, normalCushion.GetAddressOf());;
 
 	D3D11_SAMPLER_DESC sampleDesc = { };
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -158,13 +167,14 @@ void Game::CreateBasicGeometry()
 
 	// create Material
 	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 5.0f, 64.0f, srvFire, sampleState);
-	redMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShader, vertexShader, 100.0f, 64.0f, srvCurse, sampleState);
+	defaultMaterialNormal = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderNormal, vertexShaderNormal, 5.0f, 64.0f, srvFire, normalFire, sampleState);
+	cushionMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShaderNormal, vertexShaderNormal, 100.0f, 64.0f, srvCurse, normalCushion, sampleState);
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
-	topHatTwo = new GameEntity(topHat, redMaterial);
+	topHatTwo = new GameEntity(topHat, cushionMaterial);
 	cubeOne = new GameEntity(cubeMesh, defaultMaterial);
-	cubeTwo = new GameEntity(cubeMesh, redMaterial);
-	triaOne = new GameEntity(triangle, defaultMaterial);
+	cubeTwo = new GameEntity(cubeMesh, cushionMaterial);
+	triaOne = new GameEntity(triangle, defaultMaterialNormal);
 
 	topHatOne->GetTransform()->SetPosition(4, 0, 0);
 	topHatTwo->GetTransform()->SetPosition(-4, 0, 0);
@@ -271,7 +281,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	
 
-	// Set the pixel shader with the directional light
+	// Set the pixel shader with the lights
 	pixelShader->SetData(
 		"directionalLight",
 		&light,
@@ -299,6 +309,33 @@ void Game::Draw(float deltaTime, float totalTime)
 	);
 	pixelShader->CopyAllBufferData();
 
+	// Set the pixel shader normal with the lights
+	pixelShaderNormal->SetData(
+		"directionalLight",
+		&light,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderNormal->SetData(
+		"lightTwo",
+		&lightTwo,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderNormal->SetData(
+		"lightThree",
+		&lightThree,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderNormal->SetData(
+		"pointLight",
+		&pointLight,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderNormal->SetData(
+		"cameraPosition",
+		&camera->GetPosition(),
+		sizeof(DirectX::XMFLOAT3)
+	);
+	pixelShaderNormal->CopyAllBufferData();
 
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
@@ -310,6 +347,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	UINT offset = 0;
 	// Finally do the actual drawing
 	//  - Do this ONCE PER OBJECT you intend to draw
+
 	topHatOne->Draw(context, stride, offset, camera);
 	topHatTwo->Draw(context, stride, offset, camera);
 	cubeOne->Draw(context, stride, offset, camera);
