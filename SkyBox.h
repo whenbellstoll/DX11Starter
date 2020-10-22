@@ -3,6 +3,7 @@
 #include "DXCore.h"
 #include "SimpleShader.h"
 #include "Mesh.h"
+#include "Camera.h"
 #include <DirectXMath.h>
 #include <wrl/client.h>
 class SkyBox
@@ -18,6 +19,6 @@ class SkyBox
 	SkyBox(Microsoft::WRL::ComPtr<ID3D11SamplerState> sO, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11Device> device, Mesh * c, SimplePixelShader * sps, SimpleVertexShader * svs);
 	~SkyBox();
 
-	void Draw();
+	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Camera* cam);
 };
 

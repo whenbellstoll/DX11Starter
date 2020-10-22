@@ -29,7 +29,36 @@ SkyBox::~SkyBox()
 	// initalize all our pointers in Game.cpp, should delete them there.
 }
 
-void SkyBox::Draw()
+void SkyBox::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Camera * cam )
 {
+	context->RSSetState(rasterState.Get());
+	context->OMSetDepthStencilState(stencilState.Get(), 0);
 
+	vs->SetShader();
+	ps->SetShader();
+	
+	
+	vs->SetMatrix4x4("view", cam->GetViewMatrix() );
+	vs->SetMatrix4x4("proj", cam->GetProjMatrix());
+	vs->CopyAllBufferData();
+
+	// Ensure the pixel shader has the texture resources it needs
+	ps->SetShaderResourceView("cubeMap", srvSky.Get());
+	ps->SetSamplerState("samplerOptions", samplerOptions.Get());
+
+	// Draw the mesh
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	context->IASetVertexBuffers(0, 1, cube->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(cube->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+	// Do the actual drawing
+	context->DrawIndexed(
+		cube->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+		0,     // Offset to the first index we want to use
+		0);    // Offset to add to each index when looking up vertices
+
+	// Reset rasterizer and depth state
+	context->RSSetState(0);
+	context->OMSetDepthStencilState(0, 0);
 }
