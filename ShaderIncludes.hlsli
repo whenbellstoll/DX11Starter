@@ -33,6 +33,18 @@ struct VertexToPixelNormalMap
 	float3 tangent		: TANGENT;
 };
 
+// Transition struct for cube maps
+struct VertexToPixelSky
+{
+	// Data type
+	//  |
+	//  |   Name          Semantic
+	//  |    |                |
+	//  v    v                v
+	float4 position		: SV_POSITION;
+	float3 sampleDir	: SAMPLEDIRECTION;
+};
+
 // Struct representing a single vertex worth of data
 // - This should match the vertex definition in our C++ code
 // - By "match", I mean the size, order and number of members
