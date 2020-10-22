@@ -65,6 +65,10 @@ Game::~Game()
 	delete pixelShader;
 	delete vertexShaderNormal;
 	delete pixelShaderNormal;
+
+	delete skyBox;
+	delete skyVS;
+	delete skyPS;
 }
 
 // --------------------------------------------------------
@@ -125,6 +129,8 @@ void Game::LoadShaders()
 	pixelShader = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShader.cso").c_str());
 	vertexShaderNormal = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapVS.cso").c_str());
 	pixelShaderNormal = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapPS.cso").c_str());
+	skyVS = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapVS.cso").c_str());
+	skyPS = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapPS.cso").c_str());
 }
 
 
@@ -142,6 +148,9 @@ void Game::CreateBasicGeometry()
 
 	XMFLOAT2 UV = XMFLOAT2(0, 0);
 
+
+	// Load Skybox
+	CreateDDSTextureFromFile( device.Get(), GetFullPathTo_Wide(L"../../Assets/Skybox/SunnyCubeMap.dds").c_str(), nullptr, srvSky.GetAddressOf()); 
 
 	//create Mesh objects
 	triangle = new Mesh(GetFullPathTo("../../Assets/Models/cone.obj").c_str(), device);
@@ -175,6 +184,8 @@ void Game::CreateBasicGeometry()
 	cubeOne = new GameEntity(cubeMesh, defaultMaterial);
 	cubeTwo = new GameEntity(cubeMesh, cushionMaterial);
 	triaOne = new GameEntity(triangle, defaultMaterialNormal);
+
+	skyBox = new SkyBox(sampleState, srvSky, device, cubeMesh, skyPS, skyVS);
 
 	topHatOne->GetTransform()->SetPosition(4, 0, 0);
 	topHatTwo->GetTransform()->SetPosition(-4, 0, 0);
@@ -354,6 +365,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	cubeTwo->Draw(context, stride, offset, camera);
 	triaOne->Draw(context, stride, offset, camera);
 
+
+	skyBox->Draw(context, camera);
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it

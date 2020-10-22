@@ -15,7 +15,7 @@ class SkyBox
 	Mesh* cube;
 	SimplePixelShader* ps;
 	SimpleVertexShader* vs;
-
+public:
 	SkyBox(Microsoft::WRL::ComPtr<ID3D11SamplerState> sO, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11Device> device, Mesh * c, SimplePixelShader * sps, SimpleVertexShader * svs);
 	~SkyBox();
 

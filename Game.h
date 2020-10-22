@@ -7,6 +7,8 @@
 #include "Camera.h"
 #include "SimpleShader.h"
 #include "Lights.h"
+#include "SkyBox.h"
+#include "DDSTextureLoader.h"
 #include "WICTextureLoader.h"
 
 class Game	: public DXCore
@@ -63,6 +65,12 @@ private:
 
 	DirectionalLight pointLight = {};
 	DirectionalLight pointLightTwo = {};
+
+	// Skybo related shaders and resources
+	SkyBox* skyBox = nullptr;
+	SimpleVertexShader* skyVS = nullptr;
+	SimplePixelShader* skyPS = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvSky;
 
 	// Shaders and shader-related constructs
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
