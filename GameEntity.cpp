@@ -50,6 +50,13 @@ void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, UINT 
 		ps->SetShaderResourceView("normalMap", material->GetNormal().Get());
 	}
 	
+	if (material->IsPBR())
+	{
+		ps->SetShaderResourceView("AlbedoTexture", material->GetSRV().Get());
+		ps->SetShaderResourceView("RoughnessTexture", material->GetRough().Get());
+		ps->SetShaderResourceView("MetalTexture", material->GetMetal().Get());
+	}
+
 	ps->CopyAllBufferData();
 
 	// Set the buffer

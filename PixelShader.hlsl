@@ -28,7 +28,7 @@ SamplerState samplerOptions: register(s0);// "s" registers
 float4 main(VertexToPixel input) : SV_TARGET
 {
 
-	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
+	float3 surfaceColor = pow( diffuseTexture.Sample(samplerOptions, input.uv).rgb, 2.2f);
 
 	//normalize the normal
 	input.normal = normalize(input.normal);
@@ -42,5 +42,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 ambientLight = directionalLight.ambientColor;
 	finalColor = finalColor + ambientLight;
 
-	return float4(finalColor, 1);
+	return float4(pow(finalColor, 1.0f / 2.2f), 1);
 }

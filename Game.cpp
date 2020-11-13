@@ -65,6 +65,7 @@ Game::~Game()
 	delete pixelShader;
 	delete vertexShaderNormal;
 	delete pixelShaderNormal;
+	delete pixelShaderPBR;
 
 	delete skyBox;
 	delete skyVS;
@@ -129,6 +130,7 @@ void Game::LoadShaders()
 	pixelShader = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShader.cso").c_str());
 	vertexShaderNormal = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapVS.cso").c_str());
 	pixelShaderNormal = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapPS.cso").c_str());
+	pixelShaderPBR = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PBRPixelShader.cso").c_str());
 	skyVS = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapVS.cso").c_str());
 	skyPS = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapPS.cso").c_str());
 }
@@ -159,11 +161,18 @@ void Game::CreateBasicGeometry()
 
 	//Load Textures
 	HRESULT fire = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/hotnspicy.png").c_str(), nullptr, srvFire.GetAddressOf() );
-	HRESULT cursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, srvCurse.GetAddressOf());;
+	HRESULT cursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, srvCurse.GetAddressOf());
 
 	//Load Normal Maps
 	HRESULT normfire = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, normalFire.GetAddressOf());
-	HRESULT normcursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, normalCushion.GetAddressOf());;
+	HRESULT normcursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, normalCushion.GetAddressOf());
+
+
+	//Load PBR
+	HRESULT alcobble = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_albedo.png").c_str(), nullptr, albedoCobble.GetAddressOf());
+	HRESULT roucobble = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_roughness.png").c_str(), nullptr, roughCobble.GetAddressOf());
+	HRESULT metcobble = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_metal.png").c_str(), nullptr, metalCobble.GetAddressOf());
+	HRESULT normcobble = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_normals.png").c_str(), nullptr, normalCobble.GetAddressOf());
 
 	D3D11_SAMPLER_DESC sampleDesc = { };
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -176,7 +185,7 @@ void Game::CreateBasicGeometry()
 
 	// create Material
 	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 5.0f, 64.0f, srvFire, sampleState);
-	defaultMaterialNormal = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderNormal, vertexShaderNormal, 5.0f, 64.0f, srvFire, normalFire, sampleState);
+	defaultMaterialNormal = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderPBR, vertexShaderNormal, 5.0f, 64.0f, albedoCobble, normalCobble, roughCobble, metalCobble, sampleState);
 	cushionMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShaderNormal, vertexShaderNormal, 100.0f, 64.0f, srvCurse, normalCushion, sampleState);
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
@@ -347,6 +356,34 @@ void Game::Draw(float deltaTime, float totalTime)
 		sizeof(DirectX::XMFLOAT3)
 	);
 	pixelShaderNormal->CopyAllBufferData();
+
+	//Pixel shader PBR
+	pixelShaderPBR->SetData(
+		"directionalLight",
+		&light,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderPBR->SetData(
+		"lightTwo",
+		&lightTwo,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderPBR->SetData(
+		"lightThree",
+		&lightThree,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderPBR->SetData(
+		"pointLight",
+		&pointLight,
+		sizeof(DirectionalLight)
+	);
+	pixelShaderPBR->SetData(
+		"cameraPosition",
+		&camera->GetPosition(),
+		sizeof(DirectX::XMFLOAT3)
+	);
+	pixelShaderPBR->CopyAllBufferData();
 
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might

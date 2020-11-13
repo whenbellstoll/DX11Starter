@@ -58,6 +58,7 @@ private:
 	SimplePixelShader* pixelShader = nullptr;
 	SimpleVertexShader* vertexShaderNormal = nullptr;
 	SimplePixelShader* pixelShaderNormal = nullptr;
+	SimplePixelShader* pixelShaderPBR = nullptr;
 
 	DirectionalLight light = {};
 	DirectionalLight lightTwo = {};
@@ -79,4 +80,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalFire;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalCushion;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampleState;
+
+	// PBR Assets
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedoCobble;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughCobble;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalCobble;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalCobble;
+
 };

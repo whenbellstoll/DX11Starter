@@ -45,6 +45,7 @@ void SkyBox::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Camera * 
 	// Ensure the pixel shader has the texture resources it needs
 	ps->SetShaderResourceView("cubeMap", srvSky.Get());
 	ps->SetSamplerState("samplerOptions", samplerOptions.Get());
+	ps->CopyAllBufferData();
 
 	// Draw the mesh
 	UINT stride = sizeof(Vertex);
