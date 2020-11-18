@@ -66,6 +66,7 @@ Game::~Game()
 	delete vertexShaderNormal;
 	delete pixelShaderNormal;
 	delete pixelShaderPBR;
+	delete stylizedPS;
 
 	delete skyBox;
 	delete skyVS;
@@ -114,6 +115,20 @@ void Game::Init()
 	pointLight.diffuseColor = DirectX::XMFLOAT3(0.0f, 1.0f, 0.1f);
 	pointLight.direction = DirectX::XMFLOAT3(5, 1, 0);
 	pointLight.type = 1;
+
+	colorPalette[0] = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	colorPalette[1] = DirectX::XMFLOAT3(24.0f / 255.0f, 24.0f / 255.0f, 24.0f / 255.0f);
+	colorPalette[2] = DirectX::XMFLOAT3(48.0f / 255.0f, 48.0f / 255.0f, 48.0f / 255.0f);
+	colorPalette[3] = DirectX::XMFLOAT3(72.0f / 255.0f, 72.0f / 255.0f, 72.0f / 255.0f);
+	colorPalette[4] = DirectX::XMFLOAT3(96.0f / 255.0f, 96.0f / 255.0f, 96.0f / 255.0f);
+	colorPalette[5] = DirectX::XMFLOAT3(120.0f / 255.0f, 120.0f / 255.0f, 120.0f / 255.0f);
+	colorPalette[6] = DirectX::XMFLOAT3(144.0f / 255.0f, 144.0f / 255.0f, 144.0f / 255.0f);
+	colorPalette[7] = DirectX::XMFLOAT3(168.0f / 255.0f, 168.0f / 255.0f, 168.0f / 255.0f);
+	colorPalette[8] = DirectX::XMFLOAT3(192.0f / 255.0f, 192.0f / 255.0f, 192.0f / 255.0f);
+	colorPalette[9] = DirectX::XMFLOAT3(216.0f / 255.0f, 216.0f / 255.0f, 216.0f / 255.0f);
+	colorPalette[10] = DirectX::XMFLOAT3(240.0f / 255.0f, 240.0f / 255.0f, 240.0f / 255.0f);
+	colorPalette[11] = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+
 }
 
 // --------------------------------------------------------
@@ -133,6 +148,7 @@ void Game::LoadShaders()
 	pixelShaderPBR = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PBRPixelShader.cso").c_str());
 	skyVS = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapVS.cso").c_str());
 	skyPS = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapPS.cso").c_str());
+	stylizedPS = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"StyleShader.cso").c_str());
 }
 
 
@@ -184,7 +200,7 @@ void Game::CreateBasicGeometry()
 	device->CreateSamplerState(&sampleDesc, sampleState.GetAddressOf());
 
 	// create Material
-	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 5.0f, 64.0f, srvFire, sampleState);
+	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), stylizedPS, vertexShader, 5.0f, 64.0f, srvCurse, sampleState);
 	defaultMaterialNormal = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderPBR, vertexShaderNormal, 5.0f, 64.0f, albedoCobble, normalCobble, roughCobble, metalCobble, sampleState);
 	cushionMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShaderNormal, vertexShaderNormal, 100.0f, 64.0f, srvCurse, normalCushion, sampleState);
 
@@ -384,6 +400,44 @@ void Game::Draw(float deltaTime, float totalTime)
 		sizeof(DirectX::XMFLOAT3)
 	);
 	pixelShaderPBR->CopyAllBufferData();
+
+
+	//Pixel shader style
+	stylizedPS->SetData(
+		"directionalLight",
+		&light,
+		sizeof(DirectionalLight)
+	);
+	stylizedPS->SetData(
+		"lightTwo",
+		&lightTwo,
+		sizeof(DirectionalLight)
+	);
+	stylizedPS->SetData(
+		"lightThree",
+		&lightThree,
+		sizeof(DirectionalLight)
+	);
+	stylizedPS->SetData(
+		"pointLight",
+		&pointLight,
+		sizeof(DirectionalLight)
+	);
+	stylizedPS->SetData(
+		"cameraPosition",
+		&camera->GetPosition(),
+		sizeof(DirectX::XMFLOAT3)
+	);
+	
+	/*
+	stylizedPS->SetData(
+		"palette",
+		&colorPalette,
+		sizeof(DirectX::XMFLOAT3) * 12
+	);
+	*/
+
+	stylizedPS->CopyAllBufferData();
 
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might

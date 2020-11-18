@@ -59,6 +59,7 @@ private:
 	SimpleVertexShader* vertexShaderNormal = nullptr;
 	SimplePixelShader* pixelShaderNormal = nullptr;
 	SimplePixelShader* pixelShaderPBR = nullptr;
+	SimplePixelShader* stylizedPS = nullptr;
 
 	DirectionalLight light = {};
 	DirectionalLight lightTwo = {};
@@ -86,5 +87,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughCobble;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalCobble;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalCobble;
+
+	// Stylized Color Array
+	DirectX::XMFLOAT3 colorPalette[12];
 
 };
