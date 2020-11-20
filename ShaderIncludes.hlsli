@@ -228,4 +228,59 @@ float3 MicrofacetBRDF(float3 n, float3 l, float3 v, float roughness, float metal
 	// See page 16: http://blog.selfshadow.com/publications/s2012-shading-course/hoffman/s2012_pbs_physics_math_notes.pdf 
 	return (D * F * G) / (4 * max(dot(n,v), dot(n,l)));
 }
+
+// HSV from RGB formula (use sparingly)
+float3 rgbhsv(float3 rgb)
+{
+	float3 hsv;
+	float min, max, delta;
+
+	min = rgb.r < rgb.g ? rgb.r : rgb.g;
+	min = min < rgb.b ? min : rgb.b;
+
+	max = rgb.r > rgb.g ? rgb.r : rgb.g;
+	max = max > rgb.b ? max : rgb.b;
+
+	hsv.b = max;                                // v
+	delta = max - min;
+	if (delta < 0.00001)
+	{
+		hsv.g = 0;
+		hsv.r = 0; // undefined, maybe nan?
+		return hsv;
+	}
+	if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
+		hsv.g = (delta / max);                  // s
+	}
+	else {
+		// if max is 0, then r = g = b = 0              
+		// s = 0, h is undefined
+		hsv.g = 0.0;
+		hsv.r = 0.0;
+		return hsv;
+	}
+
+	if (rgb.r >= max)
+	{
+		hsv.r = (rgb.g - rgb.b) / delta;        // between yellow & magenta
+	}
+	else
+	{
+		if (rgb.g >= max)
+		{
+			hsv.r = 2.0 + (rgb.b - rgb.r) / delta;  // between cyan & yellow
+		}
+		else
+		{
+			hsv.r = 4.0 + (rgb.r - rgb.g) / delta;  // between magenta & cyan
+		}
+	}
+	hsv.r *= 60.0;                              // degrees
+
+	if (hsv.r < 0.0)
+		hsv.r += 360.0;
+
+	return hsv;
+}
+
 #endif

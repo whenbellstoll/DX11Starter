@@ -9,10 +9,14 @@ cbuffer ExternalData : register(b0)
 	float specularExpo;
 	float3 cameraPosition;
 	
+	
 }
 
 Texture2D diffuseTexture : register(t0);// "t" registers
 SamplerState samplerOptions: register(s0);// "s" registers
+
+
+
 
 
 // --------------------------------------------------------
@@ -26,20 +30,20 @@ SamplerState samplerOptions: register(s0);// "s" registers
 // --------------------------------------------------------
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	float3 palette[12];
+	float4 palette[12];
 
-	palette[0] = float3(0, 0, 0);
-	palette[1] = float3(0.0941f, 0.0941f, 0.0941f);
-	palette[2] = float3(0.1882f, 0.1882f, 0.1882f);
-	palette[3] = float3(0.2823f, 0.2823f, 0.2823f);
-	palette[4] = float3(0.3764f, 0.3764f, 0.3764f);
-	palette[5] = float3(0.4706f, 0.4706f, 0.4706f);
-	palette[6] = float3(0.5647f, 0.5647f, 0.5647f);
-	palette[7] = float3(0.6588f, 0.6588f, 0.6588f);
-	palette[8] = float3(0.7529f, 0.7529f, 0.7529f);
-	palette[9] = float3(0.8470f, 0.8470f, 0.8470f);
-	palette[10] = float3(0.9412f, 0.9412f, 0.9412f);
-	palette[11] = float3(1, 1, 1);
+	palette[0] = float4(0, 0, 0, 1);
+	palette[1] = float4(0.0941f, 0.0941f, 0.0941f, 1);
+	palette[2] = float4(0.1882f, 0.1882f, 0.1882f, 1);
+	palette[3] = float4(0.2823f, 0.2823f, 0.2823f, 1);
+	palette[4] = float4(0.3764f, 0.3764f, 0.3764f, 1);
+	palette[5] = float4(0.4706f, 0.4706f, 0.4706f, 1);
+	palette[6] = float4(0.5647f, 0.5647f, 0.5647f, 1);
+	palette[7] = float4(0.6588f, 0.6588f, 0.6588f, 1);
+	palette[8] = float4(0.7529f, 0.7529f, 0.7529f, 1);
+	palette[9] = float4(0.8470f, 0.8470f, 0.8470f, 1);
+	palette[10] = float4(0.9412f, 0.9412f, 0.9412f, 1);
+	palette[11] = float4(1, 1, 1, 1);
 
 	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 
@@ -63,26 +67,28 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	
 
+	if (index > 8)
+		index -= 1;
+
 	if (index > 11)
 		index = 11;
 
-	if (index < 4)
+	float3 finalHSV = rgbhsv(finalColor);
+	
+	if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.20f)
 	{
-		if ( finalColor.b > 0.5f && finalColor.g > 0.5f)
-		{
-			return float4(0, 1, 1, 0);
-		}
+		return float4(0, 1, 1, 1);
 	}
 
-	if (index == 11)
+
+
+	if ( (finalHSV.r > 335 || finalHSV.r < 20 ) && finalHSV.g > 0.55f)
 	{
-		if ( finalColor.g < 0.5f )
-		{
-			return float4(1, 0, 0, 0);
-		}
+		return float4(1, 0, 0, 1);
 	}
+	
 
 	
 
-	return float4( palette[index], 0 );
+	return float4( palette[index] );
 }

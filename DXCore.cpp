@@ -174,8 +174,8 @@ HRESULT DXCore::InitDirectX()
 	// chain should work
 	DXGI_SWAP_CHAIN_DESC swapDesc = {};
 	swapDesc.BufferCount = 2;
-	swapDesc.BufferDesc.Width = width;
-	swapDesc.BufferDesc.Height = height;
+	swapDesc.BufferDesc.Width = width / portion;
+	swapDesc.BufferDesc.Height = height / portion;
 	swapDesc.BufferDesc.RefreshRate.Numerator = 60;
 	swapDesc.BufferDesc.RefreshRate.Denominator = 1;
 	swapDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -267,8 +267,8 @@ HRESULT DXCore::InitDirectX()
 	D3D11_VIEWPORT viewport = {};
 	viewport.TopLeftX	= 0;
 	viewport.TopLeftY	= 0;
-	viewport.Width		= (float)width;
-	viewport.Height		= (float)height;
+	viewport.Width		= (float)width / portion;
+	viewport.Height		= (float)height / portion;
 	viewport.MinDepth	= 0.0f;
 	viewport.MaxDepth	= 1.0f;
 	context->RSSetViewports(1, &viewport);
@@ -294,8 +294,8 @@ void DXCore::OnResize()
 	// Resize the underlying swap chain buffers
 	swapChain->ResizeBuffers(
 		2,
-		width,
-		height,
+		width / portion,
+		height / portion,
 		DXGI_FORMAT_R8G8B8A8_UNORM,
 		0);
 
@@ -351,8 +351,8 @@ void DXCore::OnResize()
 	D3D11_VIEWPORT viewport = {};
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
-	viewport.Width = (float)width;
-	viewport.Height = (float)height;
+	viewport.Width = (float)width / portion;
+	viewport.Height = (float)height / portion;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 	context->RSSetViewports(1, &viewport);

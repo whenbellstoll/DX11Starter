@@ -32,6 +32,7 @@ float4 main(VertexToPixelSky input) : SV_TARGET
 	palette[11] = float3(1, 1, 1);
 
 	float4 finalColor = cubeMap.Sample(samplerOptions, input.sampleDir);
+	
 	 int index = (int)((finalColor.r * 255.0f) / (255.0f / 12.0f));
 
 
@@ -41,17 +42,18 @@ float4 main(VertexToPixelSky input) : SV_TARGET
 		 index = 11;
 
 	
-	if (finalColor.b > 0.55f  && finalColor.r < 0.55f)
-	{
-		return float4(0, 1, 1, 0);
-	}
+	 float3 finalHSV = rgbhsv(finalColor);
 
-	 if (index == 11)
+	 if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.30f)
 	 {
-		 if (finalColor.g < 0.5f)
-		 {
-			 return float4(1, 0, 0, 0);
-		 }
+		 return float4(0, 1, 1, 0);
+	 }
+
+
+
+	 if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.55f)
+	 {
+		 return float4(1, 0, 0, 0);
 	 }
 
 

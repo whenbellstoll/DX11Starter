@@ -48,6 +48,8 @@ Game::~Game()
 	delete cubeMesh;
 	delete triangle;
 	delete topHat;
+	delete chair;
+	delete table;
 
 	delete topHatOne;
 	delete topHatTwo;
@@ -55,11 +57,17 @@ Game::~Game()
 	delete cubeTwo;
 	delete triaOne;
 
+	delete tableOne;
+	delete tableTwo;
+	delete chairOne;
+
 	delete camera;
 
 	delete defaultMaterial;
 	delete cushionMaterial;
 	delete defaultMaterialNormal;
+	delete tableMaterial;
+	delete chairMaterial;
 
 	delete vertexShader;
 	delete pixelShader;
@@ -94,7 +102,7 @@ void Game::Init()
 	camera = new Camera(DirectX::XMFLOAT3(0.0f, 0.0f, -5.0f), 90.0f, 0.1f, 300.0f);
 	light = DirectionalLight();
 	light.ambientColor = DirectX::XMFLOAT3(0.2f, 0.1f, 0.1f);
-	light.diffuseColor = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	light.diffuseColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 	light.direction = DirectX::XMFLOAT3(-1.0f, 1.0f, 0);
 	light.type = 0;
 
@@ -117,16 +125,16 @@ void Game::Init()
 	pointLight.type = 1;
 
 	colorPalette[0] = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-	colorPalette[1] = DirectX::XMFLOAT3(24.0f / 255.0f, 24.0f / 255.0f, 24.0f / 255.0f);
-	colorPalette[2] = DirectX::XMFLOAT3(48.0f / 255.0f, 48.0f / 255.0f, 48.0f / 255.0f);
-	colorPalette[3] = DirectX::XMFLOAT3(72.0f / 255.0f, 72.0f / 255.0f, 72.0f / 255.0f);
-	colorPalette[4] = DirectX::XMFLOAT3(96.0f / 255.0f, 96.0f / 255.0f, 96.0f / 255.0f);
-	colorPalette[5] = DirectX::XMFLOAT3(120.0f / 255.0f, 120.0f / 255.0f, 120.0f / 255.0f);
-	colorPalette[6] = DirectX::XMFLOAT3(144.0f / 255.0f, 144.0f / 255.0f, 144.0f / 255.0f);
-	colorPalette[7] = DirectX::XMFLOAT3(168.0f / 255.0f, 168.0f / 255.0f, 168.0f / 255.0f);
-	colorPalette[8] = DirectX::XMFLOAT3(192.0f / 255.0f, 192.0f / 255.0f, 192.0f / 255.0f);
-	colorPalette[9] = DirectX::XMFLOAT3(216.0f / 255.0f, 216.0f / 255.0f, 216.0f / 255.0f);
-	colorPalette[10] = DirectX::XMFLOAT3(240.0f / 255.0f, 240.0f / 255.0f, 240.0f / 255.0f);
+	colorPalette[1] = DirectX::XMFLOAT3(0.0941f, 0.0941f, 0.0941f);
+	colorPalette[2] = DirectX::XMFLOAT3(0.1882f, 0.1882f, 0.1882f);
+	colorPalette[3] = DirectX::XMFLOAT3(0.2823f, 0.2823f, 0.2823f);
+	colorPalette[4] = DirectX::XMFLOAT3(0.3764f, 0.3764f, 0.3764f);
+	colorPalette[5] = DirectX::XMFLOAT3(0.4706f, 0.4706f, 0.4706f);
+	colorPalette[6] = DirectX::XMFLOAT3(0.5647f, 0.5647f, 0.5647f);
+	colorPalette[7] = DirectX::XMFLOAT3(0.6588f, 0.6588f, 0.6588f);
+	colorPalette[8] = DirectX::XMFLOAT3(0.7529f, 0.7529f, 0.7529f);
+	colorPalette[9] = DirectX::XMFLOAT3(0.8470f, 0.8470f, 0.8470f);
+	colorPalette[10] = DirectX::XMFLOAT3(0.9412f, 0.9412f, 0.9412f);
 	colorPalette[11] = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 }
@@ -174,15 +182,20 @@ void Game::CreateBasicGeometry()
 	triangle = new Mesh(GetFullPathTo("../../Assets/Models/cone.obj").c_str(), device);
 	topHat = new Mesh(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	cubeMesh = new Mesh(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
+	chair = new Mesh(GetFullPathTo("../../Assets/Models/chair.obj").c_str(), device);
+	table = new Mesh(GetFullPathTo("../../Assets/Models/table.obj").c_str(), device);
+
 
 	//Load Textures
 	HRESULT fire = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/hotnspicy.png").c_str(), nullptr, srvFire.GetAddressOf() );
 	HRESULT cursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, srvCurse.GetAddressOf());
+	HRESULT wood = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/wood.png").c_str(), nullptr, srvChair.GetAddressOf());
+	HRESULT fabric = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/table.jpg").c_str(), nullptr, srvTable.GetAddressOf());
 
 	//Load Normal Maps
 	HRESULT normfire = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, normalFire.GetAddressOf());
 	HRESULT normcursio = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, normalCushion.GetAddressOf());
-
+	HRESULT normtable = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/tableN.jpg").c_str(), nullptr, srvNormalTable.GetAddressOf());
 
 	//Load PBR
 	HRESULT alcobble = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_albedo.png").c_str(), nullptr, albedoCobble.GetAddressOf());
@@ -194,7 +207,7 @@ void Game::CreateBasicGeometry()
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	sampleDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampleDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampleDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	sampleDesc.MaxLOD = 16;
 
 	device->CreateSamplerState(&sampleDesc, sampleState.GetAddressOf());
@@ -203,12 +216,19 @@ void Game::CreateBasicGeometry()
 	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), stylizedPS, vertexShader, 5.0f, 64.0f, srvCurse, sampleState);
 	defaultMaterialNormal = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderPBR, vertexShaderNormal, 5.0f, 64.0f, albedoCobble, normalCobble, roughCobble, metalCobble, sampleState);
 	cushionMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShaderNormal, vertexShaderNormal, 100.0f, 64.0f, srvCurse, normalCushion, sampleState);
+	tableMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderNormal, vertexShaderNormal, 100.0f, 64.0f, srvTable, srvNormalTable, sampleState);
+	chairMaterial = new Material(XMFLOAT4(1, 1, 1, 0), stylizedPS, vertexShader, 10.0f, 32.0f, srvChair, sampleState);
+
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
 	topHatTwo = new GameEntity(topHat, cushionMaterial);
 	cubeOne = new GameEntity(cubeMesh, defaultMaterial);
 	cubeTwo = new GameEntity(cubeMesh, cushionMaterial);
 	triaOne = new GameEntity(triangle, defaultMaterialNormal);
+	tableOne = new GameEntity(table, tableMaterial);
+	tableTwo = new GameEntity(table, tableMaterial);
+	chairOne = new GameEntity(chair, chairMaterial);
+
 
 	skyBox = new SkyBox(sampleState, srvSky, device, cubeMesh, skyPS, skyVS);
 
@@ -216,6 +236,9 @@ void Game::CreateBasicGeometry()
 	topHatTwo->GetTransform()->SetPosition(-4, 0, 0);
 	cubeOne->GetTransform()->SetPosition(1, 2, 0);
 	cubeTwo->GetTransform()->SetPosition(-1, -2, 0);
+	tableOne->GetTransform()->SetPosition(2, 0, 0);
+	tableTwo->GetTransform()->SetPosition(-2, 0, 0);
+	chairOne->GetTransform()->SetPosition(1, 0, 0);
 }
 
 
@@ -429,13 +452,13 @@ void Game::Draw(float deltaTime, float totalTime)
 		sizeof(DirectX::XMFLOAT3)
 	);
 	
-	/*
-	stylizedPS->SetData(
+	
+	/*stylizedPS->SetData(
 		"palette",
 		&colorPalette,
-		sizeof(DirectX::XMFLOAT3) * 12
-	);
-	*/
+		sizeof(DirectX::XMFLOAT3) * 16
+	);*/
+	
 
 	stylizedPS->CopyAllBufferData();
 
@@ -455,7 +478,11 @@ void Game::Draw(float deltaTime, float totalTime)
 	cubeOne->Draw(context, stride, offset, camera);
 	cubeTwo->Draw(context, stride, offset, camera);
 	triaOne->Draw(context, stride, offset, camera);
-
+	
+	// Thomas Models
+	tableOne->Draw(context, stride, offset, camera);
+	tableTwo->Draw(context, stride, offset, camera);
+	chairOne->Draw(context, stride, offset, camera);
 
 	skyBox->Draw(context, camera);
 

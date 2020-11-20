@@ -41,18 +41,26 @@ private:
 	Mesh * triangle = nullptr;
 	Mesh * topHat = nullptr;
 	Mesh * cubeMesh = nullptr;
+	Mesh* table = nullptr;
+	Mesh* chair = nullptr;
 	
 	GameEntity* topHatOne = nullptr;
 	GameEntity* topHatTwo = nullptr;
 	GameEntity* cubeOne = nullptr;
 	GameEntity* cubeTwo = nullptr;
 	GameEntity* triaOne  = nullptr;
+	GameEntity* tableOne = nullptr;
+	GameEntity* tableTwo = nullptr;
+	GameEntity* chairOne = nullptr;
 
 	Camera* camera = nullptr;
 
 	Material* defaultMaterial = nullptr;
 	Material* defaultMaterialNormal = nullptr;
 	Material* cushionMaterial = nullptr;
+	Material* chairMaterial = nullptr;
+	Material* tableMaterial = nullptr;
+
 
 	SimpleVertexShader* vertexShader = nullptr;
 	SimplePixelShader* pixelShader = nullptr;
@@ -81,6 +89,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalFire;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalCushion;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampleState;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTable;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvNormalTable;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvChair;
 
 	// PBR Assets
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedoCobble;

@@ -42,5 +42,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 ambientLight = directionalLight.ambientColor;
 	finalColor = finalColor + ambientLight;
 
-	return float4(pow(finalColor, 1.0f / 2.2f), 1);
+	return float4(finalColor, 1);
 }
