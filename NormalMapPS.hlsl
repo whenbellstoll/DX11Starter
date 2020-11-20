@@ -91,7 +91,7 @@ float4 main(VertexToPixelNormalMap input) : SV_TARGET
 
 
 
-	if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.55f)
+	if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.75f)
 	{
 		return float4(1, 0, 0, 1);
 	}

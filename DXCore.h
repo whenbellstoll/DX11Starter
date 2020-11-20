@@ -91,7 +91,7 @@ private:
 	int fpsFrameCount;
 	float fpsTimeElapsed;
 
-	int portion = 1;
+	int portion = 3;
 
 	void UpdateTimer();			// Updates the timer for this frame
 	void UpdateTitleBarStats();	// Puts debug info in the title bar
