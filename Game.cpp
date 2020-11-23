@@ -75,6 +75,8 @@ Game::~Game()
 	delete pixelShaderNormal;
 	delete pixelShaderPBR;
 	delete stylizedPS;
+	delete postVS;
+	delete silhouettePS;
 
 	delete skyBox;
 	delete skyVS;
@@ -137,6 +139,29 @@ void Game::Init()
 	colorPalette[10] = DirectX::XMFLOAT3(0.9412f, 0.9412f, 0.9412f);
 	colorPalette[11] = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
+	// Set up post processing texture, RTV, and SRV.
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	textureDesc.Width = width / portion;
+	textureDesc.Height = height / portion;
+	textureDesc.ArraySize = 1;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE; // Will render to it and sample from it!
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.MipLevels = 1;
+	textureDesc.MiscFlags = 0;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	// Create the color and normals textures
+	ID3D11Texture2D* ppTexture;
+
+	device->CreateTexture2D(&textureDesc, 0, &ppTexture);
+
+	device->CreateRenderTargetView(ppTexture, 0, postRTV.ReleaseAndGetAddressOf());
+	device->CreateShaderResourceView(ppTexture, 0, postSRV.ReleaseAndGetAddressOf());
+	ppTexture->Release();
+
 }
 
 // --------------------------------------------------------
@@ -157,6 +182,8 @@ void Game::LoadShaders()
 	skyVS = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapVS.cso").c_str());
 	skyPS = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"CubemapPS.cso").c_str());
 	stylizedPS = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"StyleShader.cso").c_str());
+	silhouettePS = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"SilhouettePS.cso").c_str());
+	postVS = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"SilhouetteVS.cso").c_str());
 }
 
 
@@ -322,12 +349,11 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-	
+	// Ensure we're clearing the post process target too
+	context->ClearRenderTargetView(postRTV.Get(), color);
 
-	// Set the vertex and pixel shaders to use for the next Draw() command
-	//  - These don't technically need to be set every frame
-	//  - Once you start applying different shaders to different objects,
-	//    you'll need to swap the current shaders before each draw
+	// Set the render target
+	context->OMSetRenderTargets(1, postRTV.GetAddressOf(), depthStencilView.Get());
 	
 
 
@@ -473,18 +499,66 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Finally do the actual drawing
 	//  - Do this ONCE PER OBJECT you intend to draw
 
+	//Reset silhouette ID
+	silhouetteID = 0;
+	
+	// increment because skybox uses ID 0
+	silhouetteID++;
+	topHatOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	topHatOne->Draw(context, stride, offset, camera);
+
+	silhouetteID++;
+	topHatTwo->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	topHatTwo->Draw(context, stride, offset, camera);
+	
+	silhouetteID++;
+	cubeOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	cubeOne->Draw(context, stride, offset, camera);
+	
+	silhouetteID++;
+	cubeTwo->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	cubeTwo->Draw(context, stride, offset, camera);
+	
+	silhouetteID++;
+	triaOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	triaOne->Draw(context, stride, offset, camera);
 	
 	// Thomas Models
+	silhouetteID++;
+	tableOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	tableOne->Draw(context, stride, offset, camera);
+	
+	silhouetteID++;
+	tableTwo->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	tableTwo->Draw(context, stride, offset, camera);
+	
+	silhouetteID++;
+	chairOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	chairOne->Draw(context, stride, offset, camera);
 
 	skyBox->Draw(context, camera);
+	
+	//Go back to rendering on the actual frame
+	context->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), depthStencilView.Get());
+
+	// Set up post process shaders
+	postVS->SetShader();
+
+	silhouettePS->SetShaderResourceView("pixels", postSRV.Get());
+	silhouettePS->SetSamplerState("samplerOptions", sampleState.Get());
+	silhouettePS->SetShader();
+
+	silhouettePS->SetFloat("pixelWidth", 1.0f / (width / portion) ); // / portion
+	silhouettePS->SetFloat("pixelHeight", 1.0f / (height / portion) );
+	silhouettePS->CopyAllBufferData();
+
+	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+	ID3D11Buffer* nothing = 0;
+	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
+
+	// Draw exactly 3 vertices, which the special post-process vertex shader will
+	// "figure out" on the fly (resulting in our "full screen triangle")
+	context->Draw(3, 0);
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
@@ -494,4 +568,5 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Due to the usage of a more sophisticated swap chain,
 	// the render target must be re-bound after every call to Present()
 	context->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), depthStencilView.Get());
+	
 }

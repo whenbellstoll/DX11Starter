@@ -8,7 +8,7 @@ cbuffer ExternalData : register(b0)
 	float specularValue;
 	float specularExpo;
 	float3 cameraPosition;
-	
+	int silhouetteID;
 	
 }
 
@@ -77,18 +77,18 @@ float4 main(VertexToPixel input) : SV_TARGET
 	
 	if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.20f)
 	{
-		return float4(0, 1, 1, 1);
+		return float4(0, 1, 1, silhouetteID / 256.0f );
 	}
 
 
 
 	if ( (finalHSV.r > 335 || finalHSV.r < 20 ) && finalHSV.g > 0.75f)
 	{
-		return float4(1, 0, 0, 1);
+		return float4(1, 0, 0, silhouetteID / 256.0f );
 	}
 	
 
 	
-
+	palette[index].a = silhouetteID / 256.0f;
 	return float4( palette[index] );
 }

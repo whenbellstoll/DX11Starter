@@ -103,4 +103,11 @@ private:
 	// Stylized Color Array
 	DirectX::XMFLOAT3 colorPalette[12];
 
+	//silhouette related assets
+	int silhouetteID = 0;
+	SimplePixelShader* silhouettePS;
+	SimpleVertexShader* postVS;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> postRTV;		
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> postSRV;		
+
 };

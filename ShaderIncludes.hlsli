@@ -232,7 +232,7 @@ float3 MicrofacetBRDF(float3 n, float3 l, float3 v, float roughness, float metal
 // HSV from RGB formula (use sparingly)
 float3 rgbhsv(float3 rgb)
 {
-	float3 hsv;
+	float3 hsv = float3(0, 0, 0);
 	float min, max, delta;
 
 	min = rgb.r < rgb.g ? rgb.r : rgb.g;

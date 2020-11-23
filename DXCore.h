@@ -76,7 +76,7 @@ protected:
 
 	std::string GetFullPathTo(std::string relativeFilePath);
 	std::wstring GetFullPathTo_Wide(std::wstring relativeFilePath);
-
+	int portion = 3;
 
 private:
 	// Timing related data
@@ -91,7 +91,7 @@ private:
 	int fpsFrameCount;
 	float fpsTimeElapsed;
 
-	int portion = 3;
+	
 
 	void UpdateTimer();			// Updates the timer for this frame
 	void UpdateTitleBarStats();	// Puts debug info in the title bar
