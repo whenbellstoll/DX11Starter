@@ -126,18 +126,18 @@ void Game::Init()
 	pointLight.direction = DirectX::XMFLOAT3(5, 1, 0);
 	pointLight.type = 1;
 
-	colorPalette[0] = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-	colorPalette[1] = DirectX::XMFLOAT3(0.0941f, 0.0941f, 0.0941f);
-	colorPalette[2] = DirectX::XMFLOAT3(0.1882f, 0.1882f, 0.1882f);
-	colorPalette[3] = DirectX::XMFLOAT3(0.2823f, 0.2823f, 0.2823f);
-	colorPalette[4] = DirectX::XMFLOAT3(0.3764f, 0.3764f, 0.3764f);
-	colorPalette[5] = DirectX::XMFLOAT3(0.4706f, 0.4706f, 0.4706f);
-	colorPalette[6] = DirectX::XMFLOAT3(0.5647f, 0.5647f, 0.5647f);
-	colorPalette[7] = DirectX::XMFLOAT3(0.6588f, 0.6588f, 0.6588f);
-	colorPalette[8] = DirectX::XMFLOAT3(0.7529f, 0.7529f, 0.7529f);
-	colorPalette[9] = DirectX::XMFLOAT3(0.8470f, 0.8470f, 0.8470f);
-	colorPalette[10] = DirectX::XMFLOAT3(0.9412f, 0.9412f, 0.9412f);
-	colorPalette[11] = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	colorPalette[0] = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	colorPalette[1] = DirectX::XMFLOAT4(0.0941f, 0.0941f, 0.0941f, 0.0941f);
+	colorPalette[2] = DirectX::XMFLOAT4(0.1882f, 0.1882f, 0.1882f, 0.1882f);
+	colorPalette[3] = DirectX::XMFLOAT4(0.2823f, 0.2823f, 0.2823f, 0.2823f);
+	colorPalette[4] = DirectX::XMFLOAT4(0.3764f, 0.3764f, 0.3764f, 0.3764f);
+	colorPalette[5] = DirectX::XMFLOAT4(0.4706f, 0.4706f, 0.4706f, 0.4706f);
+	colorPalette[6] = DirectX::XMFLOAT4(0.5647f, 0.5647f, 0.5647f, 0.5647f);
+	colorPalette[7] = DirectX::XMFLOAT4(0.6588f, 0.6588f, 0.6588f, 0.6588f);
+	colorPalette[8] = DirectX::XMFLOAT4(0.7529f, 0.7529f, 0.7529f, 0.7529f);
+	colorPalette[9] = DirectX::XMFLOAT4(0.8470f, 0.8470f, 0.8470f, 0.8470f);
+	colorPalette[10] = DirectX::XMFLOAT4(0.9412f, 0.9412f, 0.9412f, 0.9412f);
+	colorPalette[11] = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Set up post processing texture, RTV, and SRV.
 	D3D11_TEXTURE2D_DESC textureDesc = {};
@@ -479,11 +479,11 @@ void Game::Draw(float deltaTime, float totalTime)
 	);
 	
 	
-	/*stylizedPS->SetData(
+	stylizedPS->SetData(
 		"palette",
 		&colorPalette,
-		sizeof(DirectX::XMFLOAT3) * 16
-	);*/
+		sizeof(DirectX::XMFLOAT4) * 12
+	);
 	
 
 	stylizedPS->CopyAllBufferData();

@@ -101,7 +101,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalCobble;
 
 	// Stylized Color Array
-	DirectX::XMFLOAT3 colorPalette[12];
+	DirectX::XMFLOAT4 colorPalette[12];
 
 	//silhouette related assets
 	int silhouetteID = 0;

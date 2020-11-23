@@ -8,6 +8,7 @@ cbuffer ExternalData : register(b0)
 	float specularValue;
 	float specularExpo;
 	float3 cameraPosition;
+	float4 palette[12];
 	int silhouetteID;
 	
 }
@@ -30,8 +31,8 @@ SamplerState samplerOptions: register(s0);// "s" registers
 // --------------------------------------------------------
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	float4 palette[12];
-
+	
+	/*
 	palette[0] = float4(0, 0, 0, 1);
 	palette[1] = float4(0.0941f, 0.0941f, 0.0941f, 1);
 	palette[2] = float4(0.1882f, 0.1882f, 0.1882f, 1);
@@ -43,7 +44,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	palette[8] = float4(0.7529f, 0.7529f, 0.7529f, 1);
 	palette[9] = float4(0.8470f, 0.8470f, 0.8470f, 1);
 	palette[10] = float4(0.9412f, 0.9412f, 0.9412f, 1);
-	palette[11] = float4(1, 1, 1, 1);
+	palette[11] = float4(1, 1, 1, 1);*/
 
 	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 
@@ -89,6 +90,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	
 
 	
-	palette[index].a = silhouetteID / 256.0f;
-	return float4( palette[index] );
+	return float4( palette[index].r, palette[index].g, palette[index].b, silhouetteID / 256.0f);
 }
