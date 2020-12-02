@@ -8,6 +8,7 @@ cbuffer ExternalData : register(b0)
 	float specularValue;
 	float specularExpo;
 	float3 cameraPosition;
+	int silhouetteID;
 	
 	
 }
@@ -28,7 +29,7 @@ SamplerState samplerOptions: register(s0);// "s" registers
 float4 main(VertexToPixel input) : SV_TARGET
 {
 
-	float3 surfaceColor = pow( diffuseTexture.Sample(samplerOptions, input.uv).rgb, 2.2f);
+	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 
 	//normalize the normal
 	input.normal = normalize(input.normal);
@@ -42,5 +43,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 ambientLight = directionalLight.ambientColor;
 	finalColor = finalColor + ambientLight;
 
-	return float4(finalColor, 1);
+	return float4(finalColor, silhouetteID / 256.0f);
 }

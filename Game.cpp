@@ -126,6 +126,7 @@ void Game::Init()
 	pointLight.direction = DirectX::XMFLOAT3(5, 1, 0);
 	pointLight.type = 1;
 
+	// assign the palettes
 	colorPalette[0] = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 	colorPalette[1] = DirectX::XMFLOAT4(0.0941f, 0.0941f, 0.0941f, 0.0941f);
 	colorPalette[2] = DirectX::XMFLOAT4(0.1882f, 0.1882f, 0.1882f, 0.1882f);
@@ -138,6 +139,34 @@ void Game::Init()
 	colorPalette[9] = DirectX::XMFLOAT4(0.8470f, 0.8470f, 0.8470f, 0.8470f);
 	colorPalette[10] = DirectX::XMFLOAT4(0.9412f, 0.9412f, 0.9412f, 0.9412f);
 	colorPalette[11] = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+	newPalette[0] = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	newPalette[1] = DirectX::XMFLOAT4(0.1294f, 0.2509f, 0.6039f, 0.0941f);
+	newPalette[2] = DirectX::XMFLOAT4(0.2862f, 0.2666f, 0.2314f, 0.1882f);
+	newPalette[3] = DirectX::XMFLOAT4(0.4549f, 0.6431f, 0.4f, 0.2823f);
+	newPalette[4] = DirectX::XMFLOAT4(0.5372f, 0.1569f, 0.8588f, 0.3764f);
+	newPalette[5] = DirectX::XMFLOAT4(0.6588f, 0.8941f, 0.8588f, 0.4706f);
+	newPalette[6] = DirectX::XMFLOAT4(0.6980f, 0.3569f, 0.0470f, 0.5647f);
+	newPalette[7] = DirectX::XMFLOAT4(0.7451f, 0.1176f, 0.1765f, 0.6588f);
+	newPalette[8] = DirectX::XMFLOAT4(0.8118f, 0.6784f, 0.0549f, 0.7529f);
+	newPalette[9] = DirectX::XMFLOAT4(0.8627f, 0.2667f, 0.1412f, 0.8470f);
+	newPalette[10] = DirectX::XMFLOAT4(0.9607f, 0.8509f, 0.0863f, 0.9412f);
+	newPalette[11] = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	bauhausPalette[0] = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	bauhausPalette[1] = DirectX::XMFLOAT4(0.0431f, 0.1529f, 0.4274f, 0.0941f);
+	bauhausPalette[2] = DirectX::XMFLOAT4(0.1058f, 0.5569f, 0.3569f, 0.1882f);
+	bauhausPalette[3] = DirectX::XMFLOAT4(0.2f, 0.6824f, 0.0509f, 0.2823f);
+	bauhausPalette[4] = DirectX::XMFLOAT4(0.2588f, 0.2784f, 0.3098f, 0.3764f);
+	bauhausPalette[5] = DirectX::XMFLOAT4(0.3059f, 0.4509f, 0.5098f, 0.4706f);
+	bauhausPalette[6] = DirectX::XMFLOAT4(0.5058f, 0.3059f, 0.2118f, 0.5647f);
+	bauhausPalette[7] = DirectX::XMFLOAT4(0.7372f, 0.1804f, 0.1059f, 0.6588f);
+	bauhausPalette[8] = DirectX::XMFLOAT4(0.7529f, 0.5804f, 0.5569f, 0.7529f);
+	bauhausPalette[9] = DirectX::XMFLOAT4(0.8627f, 0.8235f, 0.3412f, 0.8470f);
+	bauhausPalette[10] = DirectX::XMFLOAT4(0.9294f, 0.8980f, 0.6078f, 0.9412f);
+	bauhausPalette[11] = DirectX::XMFLOAT4(1.0f, 0.533f, 0.0745f, 1.0f);
+
 
 	// Set up post processing texture, RTV, and SRV.
 	D3D11_TEXTURE2D_DESC textureDesc = {};
@@ -158,10 +187,13 @@ void Game::Init()
 
 	device->CreateTexture2D(&textureDesc, 0, &ppTexture);
 
-	device->CreateRenderTargetView(ppTexture, 0, postRTV.ReleaseAndGetAddressOf());
-	device->CreateShaderResourceView(ppTexture, 0, postSRV.ReleaseAndGetAddressOf());
+	if (ppTexture != 0)
+	{
+		device->CreateRenderTargetView(ppTexture, 0, postRTV.ReleaseAndGetAddressOf());
+		device->CreateShaderResourceView(ppTexture, 0, postSRV.ReleaseAndGetAddressOf());
+		
+	}
 	ppTexture->Release();
-
 }
 
 // --------------------------------------------------------
@@ -240,11 +272,11 @@ void Game::CreateBasicGeometry()
 	device->CreateSamplerState(&sampleDesc, sampleState.GetAddressOf());
 
 	// create Material
-	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), stylizedPS, vertexShader, 5.0f, 64.0f, srvCurse, sampleState);
+	defaultMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 5.0f, 64.0f, srvCurse, sampleState);
 	defaultMaterialNormal = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderPBR, vertexShaderNormal, 5.0f, 64.0f, albedoCobble, normalCobble, roughCobble, metalCobble, sampleState);
 	cushionMaterial = new Material(XMFLOAT4(1, 0, 0, 0), pixelShaderNormal, vertexShaderNormal, 100.0f, 64.0f, srvCurse, normalCushion, sampleState);
 	tableMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShaderNormal, vertexShaderNormal, 100.0f, 64.0f, srvTable, srvNormalTable, sampleState);
-	chairMaterial = new Material(XMFLOAT4(1, 1, 1, 0), stylizedPS, vertexShader, 10.0f, 32.0f, srvChair, sampleState);
+	chairMaterial = new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader, 10.0f, 32.0f, srvChair, sampleState);
 
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
@@ -281,6 +313,33 @@ void Game::OnResize()
 	}
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
+
+	// Set up post processing texture, RTV, and SRV.
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	textureDesc.Width = width / portion;
+	textureDesc.Height = height / portion;
+	textureDesc.ArraySize = 1;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE; // Will render to it and sample from it!
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.MipLevels = 1;
+	textureDesc.MiscFlags = 0;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	// Create the color and normals textures
+	ID3D11Texture2D* ppTexture;
+
+	device->CreateTexture2D(&textureDesc, 0, &ppTexture);
+
+	if (ppTexture != 0)
+	{
+		device->CreateRenderTargetView(ppTexture, 0, postRTV.ReleaseAndGetAddressOf());
+		device->CreateShaderResourceView(ppTexture, 0, postSRV.ReleaseAndGetAddressOf());
+	}
+	
+	ppTexture->Release();
 }
 
 // --------------------------------------------------------
@@ -291,6 +350,16 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+
+	// Overall input bools
+	bool currentTab = (GetAsyncKeyState(VK_TAB) & 0x8000) != 0;
+
+	// Check for change and wrap if necessary
+	if (currentTab && !prevTab) paletteNumber++;
+	if (paletteNumber > 2) paletteNumber = 0;
+
+	// Save state for next frame
+	prevTab = currentTab;
 
 	//Update the camera
 	camera->Update(deltaTime, hWnd);
@@ -479,11 +548,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	);
 	
 	
-	stylizedPS->SetData(
-		"palette",
-		&colorPalette,
-		sizeof(DirectX::XMFLOAT4) * 12
-	);
+
 	
 
 	stylizedPS->CopyAllBufferData();
@@ -550,6 +615,31 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	silhouettePS->SetFloat("pixelWidth", 1.0f / (width / portion) ); // / portion
 	silhouettePS->SetFloat("pixelHeight", 1.0f / (height / portion) );
+
+	// Set Palette
+	// are we allowed to use auto?
+	auto PaletteUsed = &colorPalette;
+	switch (paletteNumber)
+	{
+	case 0:
+		PaletteUsed = &colorPalette;
+		break;
+
+	case 1:
+		PaletteUsed = &newPalette;
+		break;
+	case 2:
+		PaletteUsed = &bauhausPalette;
+		break;
+	default:
+		PaletteUsed = &newPalette;
+	}
+
+	silhouettePS->SetData(
+		"palette",
+		PaletteUsed,
+		sizeof(DirectX::XMFLOAT4) * 12
+	);
 	silhouettePS->CopyAllBufferData();
 
 	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);

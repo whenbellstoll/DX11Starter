@@ -54,51 +54,6 @@ float4 main(VertexToPixelNormalMap input) : SV_TARGET
 	float3 ambientLight = directionalLight.ambientColor;
 	finalColor = finalColor + ambientLight;
 
-	//return float4(finalColor, 1);
-	//stylization
-	float4 palette[12];
-
-	palette[0] = float4(0, 0, 0, 1);
-	palette[1] = float4(0.0941f, 0.0941f, 0.0941f, 1);
-	palette[2] = float4(0.1882f, 0.1882f, 0.1882f, 1);
-	palette[3] = float4(0.2823f, 0.2823f, 0.2823f, 1);
-	palette[4] = float4(0.3764f, 0.3764f, 0.3764f, 1);
-	palette[5] = float4(0.4706f, 0.4706f, 0.4706f, 1);
-	palette[6] = float4(0.5647f, 0.5647f, 0.5647f, 1);
-	palette[7] = float4(0.6588f, 0.6588f, 0.6588f, 1);
-	palette[8] = float4(0.7529f, 0.7529f, 0.7529f, 1);
-	palette[9] = float4(0.8470f, 0.8470f, 0.8470f, 1);
-	palette[10] = float4(0.9412f, 0.9412f, 0.9412f, 1);
-	palette[11] = float4(1, 1, 1, 1);
-
-	int index = (int)((finalColor.r * 255.0f) / (255.0f / 12.0f));
-
-
-
-
-	if (index > 8)
-		index -= 1;
-
-	if (index > 11)
-		index = 11;
-
-	float3 finalHSV = rgbhsv(finalColor);
-
-	if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.20f)
-	{
-		return float4(0, 1, 1, silhouetteID / 256.0f);
-	}
-
-
-
-	if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.75f)
-	{
-		return float4(1, 0, 0, silhouetteID / 256.0f);
-	}
-
-
-
-	palette[index].a = silhouetteID / 256.0f;
-	return float4(palette[index]);
+	return float4(finalColor, silhouetteID / 256.0f);
 	
 }

@@ -32,19 +32,6 @@ SamplerState samplerOptions: register(s0);// "s" registers
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	
-	/*
-	palette[0] = float4(0, 0, 0, 1);
-	palette[1] = float4(0.0941f, 0.0941f, 0.0941f, 1);
-	palette[2] = float4(0.1882f, 0.1882f, 0.1882f, 1);
-	palette[3] = float4(0.2823f, 0.2823f, 0.2823f, 1);
-	palette[4] = float4(0.3764f, 0.3764f, 0.3764f, 1);
-	palette[5] = float4(0.4706f, 0.4706f, 0.4706f, 1);
-	palette[6] = float4(0.5647f, 0.5647f, 0.5647f, 1);
-	palette[7] = float4(0.6588f, 0.6588f, 0.6588f, 1);
-	palette[8] = float4(0.7529f, 0.7529f, 0.7529f, 1);
-	palette[9] = float4(0.8470f, 0.8470f, 0.8470f, 1);
-	palette[10] = float4(0.9412f, 0.9412f, 0.9412f, 1);
-	palette[11] = float4(1, 1, 1, 1);*/
 
 	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 
@@ -73,22 +60,25 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	if (index > 11)
 		index = 11;
-
-	float3 finalHSV = rgbhsv(finalColor);
 	
-	if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.20f)
+	// if the palette is the grayscale palette
+	if (palette[1].r - 0.0941f < 0.005f && palette[1].r - 0.0941f > -0.005f)
 	{
-		return float4(0, 1, 1, silhouetteID / 256.0f );
+		float3 finalHSV = rgbhsv(finalColor);
+
+		if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.20f)
+		{
+			return float4(0, 1, 1, silhouetteID / 256.0f);
+		}
+
+
+
+		if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.75f)
+		{
+			return float4(1, 0, 0, silhouetteID / 256.0f);
+		}
+
 	}
-
-
-
-	if ( (finalHSV.r > 335 || finalHSV.r < 20 ) && finalHSV.g > 0.75f)
-	{
-		return float4(1, 0, 0, silhouetteID / 256.0f );
-	}
-	
-
 	
 	return float4( palette[index].r, palette[index].g, palette[index].b, silhouetteID / 256.0f);
 }

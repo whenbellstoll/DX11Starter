@@ -2,6 +2,7 @@ cbuffer ExternalData : register(b0)
 {
 	float pixelWidth;
 	float pixelHeight;
+	float4 palette[12];
 }
 
 
@@ -15,6 +16,60 @@ struct VertexToSilho
 // Textures and such
 Texture2D pixels			: register(t0);
 SamplerState samplerOptions	: register(s0);
+
+
+float3 rgbhsv(float3 rgb)
+{
+	float3 hsv = float3(0, 0, 0);
+	float min, max, delta;
+
+	min = rgb.r < rgb.g ? rgb.r : rgb.g;
+	min = min < rgb.b ? min : rgb.b;
+
+	max = rgb.r > rgb.g ? rgb.r : rgb.g;
+	max = max > rgb.b ? max : rgb.b;
+
+	hsv.b = max;                                // v
+	delta = max - min;
+	if (delta < 0.00001)
+	{
+		hsv.g = 0;
+		hsv.r = 0; // undefined, maybe nan?
+		return hsv;
+	}
+	if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
+		hsv.g = (delta / max);                  // s
+	}
+	else {
+		// if max is 0, then r = g = b = 0              
+		// s = 0, h is undefined
+		hsv.g = 0.0;
+		hsv.r = 0.0;
+		return hsv;
+	}
+
+	if (rgb.r >= max)
+	{
+		hsv.r = (rgb.g - rgb.b) / delta;        // between yellow & magenta
+	}
+	else
+	{
+		if (rgb.g >= max)
+		{
+			hsv.r = 2.0 + (rgb.b - rgb.r) / delta;  // between cyan & yellow
+		}
+		else
+		{
+			hsv.r = 4.0 + (rgb.r - rgb.g) / delta;  // between magenta & cyan
+		}
+	}
+	hsv.r *= 60.0;                              // degrees
+
+	if (hsv.r < 0.0)
+		hsv.r += 360.0;
+
+	return hsv;
+}
 
 
 // Entry point for this pixel shader
@@ -44,7 +99,57 @@ float4 main(VertexToSilho input) : SV_TARGET
 		samples[7].a == samples[4].a &&
 		samples[8].a == samples[4].a;
 	
-	// Which color do we use?
-	float3 finalColor = same ? samples[4].rgb : float3(0, 0, 0);
-	return float4(finalColor, 1);
+	// We know that this pixel is an outline
+	if( !same )
+	return float4(0, 0, 0, 1);
+
+	// We know that it is an inner pixel, do the pallette shader post process
+	// stylize the color based on the current pixel
+	int index = (int)((samples[4].r * 255.0f) / (255.0f / 12.0f));
+
+
+
+
+	if (index > 8)
+		index -= 1;
+
+	if (index > 11)
+		index = 11;
+
+
+	// NOT FUN! ...  OR GOOD!
+	// if the palette is the grayscale palette
+	if (palette[1].r - 0.0941f < 0.005f && palette[1].r - 0.0941f > -0.005f)
+	{
+		float3 finalHSV = rgbhsv(samples[4]);
+
+		if (samples[4].a != 0) // Skybox is slightly different
+		{
+			if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.20f)
+			{
+				return float4(0, 1, 1, 0);
+			}
+
+			if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.75f)
+			{
+				return float4(1, 0, 0, 0);
+			}
+		}
+		else
+		{
+			if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.30f)
+			{
+				return float4(0, 1, 1, 0);
+			}
+
+
+
+			if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.55f)
+			{
+				return float4(1, 0, 0, 0);
+			}
+		}
+	}
+
+	return float4(palette[index]);
 }

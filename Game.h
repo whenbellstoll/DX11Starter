@@ -102,6 +102,10 @@ private:
 
 	// Stylized Color Array
 	DirectX::XMFLOAT4 colorPalette[12];
+	DirectX::XMFLOAT4 newPalette[12];
+	DirectX::XMFLOAT4 bauhausPalette[12];
+	char paletteNumber = 0;
+	bool prevTab = false;
 
 	//silhouette related assets
 	int silhouetteID = 0;
