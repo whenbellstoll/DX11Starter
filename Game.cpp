@@ -59,7 +59,15 @@ Game::~Game()
 
 	delete tableOne;
 	delete tableTwo;
+	
 	delete chairOne;
+	delete chairTwo;
+	delete chairThree;
+	delete chairFour;
+	delete chairFive;
+	delete chairSix;
+	delete chairSeven;
+	delete chairEight;
 
 	delete camera;
 
@@ -281,23 +289,66 @@ void Game::CreateBasicGeometry()
 
 	topHatOne = new GameEntity(topHat, defaultMaterial);
 	topHatTwo = new GameEntity(topHat, cushionMaterial);
-	cubeOne = new GameEntity(cubeMesh, defaultMaterial);
-	cubeTwo = new GameEntity(cubeMesh, cushionMaterial);
+	cubeOne = new GameEntity(cubeMesh, defaultMaterialNormal);
+	cubeTwo = new GameEntity(cubeMesh, defaultMaterialNormal);
 	triaOne = new GameEntity(triangle, defaultMaterialNormal);
 	tableOne = new GameEntity(table, tableMaterial);
 	tableTwo = new GameEntity(table, tableMaterial);
 	chairOne = new GameEntity(chair, chairMaterial);
-
+	chairTwo = new GameEntity(chair, chairMaterial);
+	chairThree = new GameEntity(chair, chairMaterial);
+	chairFour = new GameEntity(chair, chairMaterial);
+	chairFive = new GameEntity(chair, chairMaterial);
+	chairSix = new GameEntity(chair, chairMaterial);
+	chairSeven = new GameEntity(chair, chairMaterial);
+	chairEight = new GameEntity(chair, chairMaterial);
 
 	skyBox = new SkyBox(sampleState, srvSky, device, cubeMesh, skyPS, skyVS);
 
 	topHatOne->GetTransform()->SetPosition(4, 0, 0);
 	topHatTwo->GetTransform()->SetPosition(-4, 0, 0);
-	cubeOne->GetTransform()->SetPosition(1, 2, 0);
-	cubeTwo->GetTransform()->SetPosition(-1, -2, 0);
+	cubeOne->GetTransform()->SetPosition(-3, -1.2f, 0);
+	cubeOne->GetTransform()->SetScale(6, 0.5f, 6);
+	cubeTwo->GetTransform()->SetPosition(3, -1.2f, 0);
+	cubeTwo->GetTransform()->SetScale(6, 0.5f, 6);
+
 	tableOne->GetTransform()->SetPosition(2, 0, 0);
 	tableTwo->GetTransform()->SetPosition(-2, 0, 0);
-	chairOne->GetTransform()->SetPosition(1, 0, 0);
+
+	// chairs
+	chairOne->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairOne->GetTransform()->SetPosition(-0.25f, -1.0f, 0);
+	chairOne->GetTransform()->SetRotation(0, 80, 0);
+	
+	chairTwo->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairTwo->GetTransform()->SetPosition(-3.8f, -1.0f, -0.6f);
+	chairTwo->GetTransform()->SetRotation(0, 26, 0);
+
+	chairThree->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairThree->GetTransform()->SetPosition(-2.25f, -1.0f, 1.8f);
+	chairThree->GetTransform()->SetRotation(0, 2.792f, 0);
+
+	chairFour->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairFour->GetTransform()->SetPosition(-1.65f, -1.0f, -1.8f);
+	chairFour->GetTransform()->SetRotation(0, 5.759f, 0);
+
+	chairFive->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairFive->GetTransform()->SetPosition(3.75f, -1.0f, 0);
+	chairFive->GetTransform()->SetRotation(0, 80, 0);
+
+	chairSix->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairSix->GetTransform()->SetPosition( 0.2f, -1.0f, -0.6f);
+	chairSix->GetTransform()->SetRotation(0, 26, 0);
+
+	chairSeven->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairSeven->GetTransform()->SetPosition(1.75f, -1.0f, 1.8f);
+	chairSeven->GetTransform()->SetRotation(0, 2.792f, 0);
+
+	chairEight->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	chairEight->GetTransform()->SetPosition(2.35f, -1.0f, -1.8f);
+	chairEight->GetTransform()->SetRotation(0, 5.759f, 0);
+
+
 }
 
 
@@ -366,14 +417,10 @@ void Game::Update(float deltaTime, float totalTime)
 
 
 	// Update the objects
-
-	// cube one rotates about the x-axis
-	cubeOne->GetTransform()->Rotate(0, 0.1f * deltaTime, 0);
-	cubeOne->GetTransform()->MoveAbsolute(-0.03f * deltaTime, 0, 0);
+	
 
 	// cube two rotates the other way and moves right
-	cubeTwo->GetTransform()->Rotate(-0.1f * deltaTime, 0, 0);
-	cubeTwo->GetTransform()->MoveAbsolute( 0.03f * deltaTime, 0, 0);
+	//chairOne->GetTransform()->Rotate(0, -0.1f * deltaTime, 0);
 
 	// top Hat one rotates about the z
 	topHatOne->GetTransform()->Rotate(0, 0, 0.1f * deltaTime);
@@ -570,23 +617,23 @@ void Game::Draw(float deltaTime, float totalTime)
 	// increment because skybox uses ID 0
 	silhouetteID++;
 	topHatOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
-	topHatOne->Draw(context, stride, offset, camera);
+	//topHatOne->Draw(context, stride, offset, camera);
 
 	silhouetteID++;
 	topHatTwo->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
-	topHatTwo->Draw(context, stride, offset, camera);
+	//topHatTwo->Draw(context, stride, offset, camera);
 	
 	silhouetteID++;
+	// use the same silhouette ID so no weird border between them
 	cubeOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	cubeOne->Draw(context, stride, offset, camera);
-	
-	silhouetteID++;
 	cubeTwo->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	cubeTwo->Draw(context, stride, offset, camera);
+
 	
 	silhouetteID++;
 	triaOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
-	triaOne->Draw(context, stride, offset, camera);
+	//triaOne->Draw(context, stride, offset, camera);
 	
 	// Thomas Models
 	silhouetteID++;
@@ -601,6 +648,34 @@ void Game::Draw(float deltaTime, float totalTime)
 	chairOne->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
 	chairOne->Draw(context, stride, offset, camera);
 
+	silhouetteID++;
+	chairTwo->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
+	chairTwo->Draw(context, stride, offset, camera);
+
+	silhouetteID++;
+	chairThree->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
+	chairThree->Draw(context, stride, offset, camera);
+
+	silhouetteID++;
+	chairFour->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
+	chairFour->Draw(context, stride, offset, camera);
+
+	silhouetteID++;
+	chairFive->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
+	chairFive->Draw(context, stride, offset, camera);
+
+	silhouetteID++;
+	chairSix->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
+	chairSix->Draw(context, stride, offset, camera);
+
+	silhouetteID++;
+	chairSeven->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
+	chairSeven->Draw(context, stride, offset, camera);
+
+	silhouetteID++;
+	chairEight->GetMaterial()->GetPixelShader()->SetInt("silhouetteID", silhouetteID);
+	chairEight->Draw(context, stride, offset, camera);
+	
 	skyBox->Draw(context, camera);
 	
 	//Go back to rendering on the actual frame

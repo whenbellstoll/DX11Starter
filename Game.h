@@ -49,9 +49,19 @@ private:
 	GameEntity* cubeOne = nullptr;
 	GameEntity* cubeTwo = nullptr;
 	GameEntity* triaOne  = nullptr;
+	// Two tables
 	GameEntity* tableOne = nullptr;
 	GameEntity* tableTwo = nullptr;
+	
+	// Eight chairs
 	GameEntity* chairOne = nullptr;
+	GameEntity* chairTwo = nullptr;
+	GameEntity* chairThree = nullptr;
+	GameEntity* chairFour = nullptr;
+	GameEntity* chairFive = nullptr;
+	GameEntity* chairSix = nullptr;
+	GameEntity* chairSeven = nullptr;
+	GameEntity* chairEight = nullptr;
 
 	Camera* camera = nullptr;
 

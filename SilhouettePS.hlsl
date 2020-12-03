@@ -18,6 +18,7 @@ Texture2D pixels			: register(t0);
 SamplerState samplerOptions	: register(s0);
 
 
+// rgb to hsv function. expensive. use sparingly.
 float3 rgbhsv(float3 rgb)
 {
 	float3 hsv = float3(0, 0, 0);
@@ -34,7 +35,7 @@ float3 rgbhsv(float3 rgb)
 	if (delta < 0.00001)
 	{
 		hsv.g = 0;
-		hsv.r = 0; // undefined, maybe nan?
+		hsv.r = 0; // undefined, maybe nan? decided on 0
 		return hsv;
 	}
 	if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
@@ -72,7 +73,6 @@ float3 rgbhsv(float3 rgb)
 }
 
 
-// Entry point for this pixel shader
 float4 main(VertexToSilho input) : SV_TARGET
 {
 	
@@ -82,7 +82,7 @@ float4 main(VertexToSilho input) : SV_TARGET
 	samples[1] = pixels.Sample(samplerOptions, input.uv + float2(0, -pixelHeight));
 	samples[2] = pixels.Sample(samplerOptions, input.uv + float2(pixelWidth, -pixelHeight));
 	samples[3] = pixels.Sample(samplerOptions, input.uv + float2(-pixelWidth, 0));
-	samples[4] = pixels.Sample(samplerOptions, input.uv); // THIS PIXEL!
+	samples[4] = pixels.Sample(samplerOptions, input.uv); 
 	samples[5] = pixels.Sample(samplerOptions, input.uv + float2(pixelWidth, 0));
 	samples[6] = pixels.Sample(samplerOptions, input.uv + float2(-pixelWidth, pixelHeight));
 	samples[7] = pixels.Sample(samplerOptions, input.uv + float2(0, pixelHeight));
@@ -109,10 +109,6 @@ float4 main(VertexToSilho input) : SV_TARGET
 
 
 
-
-	if (index > 8)
-		index -= 1;
-
 	if (index > 11)
 		index = 11;
 
@@ -123,31 +119,14 @@ float4 main(VertexToSilho input) : SV_TARGET
 	{
 		float3 finalHSV = rgbhsv(samples[4]);
 
-		if (samples[4].a != 0) // Skybox is slightly different
+		if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.30f)
 		{
-			if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.20f)
-			{
-				return float4(0, 1, 1, 0);
-			}
-
-			if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.75f)
-			{
-				return float4(1, 0, 0, 0);
-			}
+			return float4(0, 1, 1, 0);
 		}
-		else
+
+		if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.55f)
 		{
-			if (finalHSV.r > 150 && finalHSV.r < 240 && finalHSV.g > 0.30f)
-			{
-				return float4(0, 1, 1, 0);
-			}
-
-
-
-			if ((finalHSV.r > 335 || finalHSV.r < 20) && finalHSV.g > 0.55f)
-			{
-				return float4(1, 0, 0, 0);
-			}
+			return float4(1, 0, 0, 0);
 		}
 	}
 
